@@ -13,13 +13,13 @@ class BaseResourceClient:
         self.changed = False
 
     def get_by_id(self, resource_id: str, **kwargs) -> dict:
-        pass
+        raise NotImplementedError
 
     def get_list(self, **kwargs) -> list:
-        pass
+        raise NotImplementedError
 
     def get_first_by_filters(self, **kwargs) -> Optional[dict]:
-        pass
+        raise NotImplementedError
 
     def get_by_name(self, name: str) -> Optional[dict]:
-        pass
+        raise NotImplementedError
