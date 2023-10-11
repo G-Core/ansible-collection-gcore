@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "gcore"
+version = "0.0.1"
+description = "Ansible GCore"
+authors = ["Your Name <you@example.com>"]
+license = "GPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.9"
+ansible-core = "^2.15.5"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+isort = "^5.12.0"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
