@@ -1,6 +1,7 @@
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 
 from .api import GCoreAPIClient
+from .clients.image import GCoreImageClient
 from .clients.volume import GCoreVolumeClient
 
 
@@ -12,6 +13,10 @@ class AnsibleGCore:
     @property
     def volumes(self) -> GCoreVolumeClient:
         return GCoreVolumeClient(self.module, "v1/volumes/")
+
+    @property
+    def images(self) -> GCoreImageClient:
+        return GCoreImageClient(self.module, "v1/images/")
 
     @staticmethod
     def get_api_spec() -> dict:

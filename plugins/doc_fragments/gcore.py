@@ -26,4 +26,8 @@ options:
             - GCore API region ID
         type: int
         required: true
+seealso:
+- name: Documentation for GCore Cloud API
+  description: Complete public API documentation.
+  link: https://api.gcore.com/docs/cloud
 """
