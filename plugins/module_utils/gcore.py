@@ -3,6 +3,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.api import GCoreAPICli
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.image import (
     GCoreImageClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.instance import (
+    GCoreInstanceClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.volume import (
     GCoreVolumeClient,
 )
@@ -21,6 +24,10 @@ class AnsibleGCore:
     def images(self) -> GCoreImageClient:
         return GCoreImageClient(self.module, "v1/images/")
 
+    @property
+    def instances(self) -> GCoreInstanceClient:
+        return GCoreInstanceClient(self.module, "v1/instances/")
+
     @staticmethod
     def get_api_spec() -> dict:
         return dict(
@@ -38,7 +45,7 @@ class AnsibleGCore:
             api_timeout=dict(
                 type="int",
                 fallback=(env_fallback, ["GCORE_API_TIMEOUT"]),
-                default=5,
+                default=30,
             ),
             project_id=dict(
                 type="int",

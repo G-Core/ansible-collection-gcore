@@ -2,6 +2,8 @@
 requires_ansible: ">=2.13.0"
 action_groups:
   cloud:
+    - instance
+    - instance_info
     - volume
     - volume_info
     - image_info

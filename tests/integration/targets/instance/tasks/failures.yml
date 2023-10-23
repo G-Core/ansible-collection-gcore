@@ -1,0 +1,16 @@
+---
+- block:
+    - name: Fail missing command param
+      gcore.cloud.instance:
+        api_token: "{{ GCORE_API_TOKEN }}"
+        api_host: "{{ GCORE_API_HOST }}"
+        project_id: "{{ GCORE_PROJECT_ID }}"
+        region_id: "{{ GCORE_REGION_ID }}"
+      register: result
+      ignore_errors: True
+
+    - name: Fail command
+      assert:
+        that:
+          - result is failed
+          - result.msg.startswith('missing required arguments')

@@ -1,0 +1,95 @@
+---
+- vars:
+    api_token: "{{ GCORE_API_TOKEN }}"
+    api_host: "{{ GCORE_API_HOST }}"
+    project_id: "{{ GCORE_PROJECT_ID }}"
+    region_id: "{{ GCORE_REGION_ID }}"
+    instance_name: test_ansible_instance
+    new_instance_name: test_ansible_instance_2
+    instance_flavor: g1-standard-1-2
+    instance_volumes: [{'source': 'image', 'size': 10, 'type_name': 'standard', 'boot_index': 0, 'image_id': 'df552051-d3aa-4f7a-9f6b-c6d911e42213', 'delete_on_termination': True}]
+    instance_interfaces: [{'type': 'external'}]
+
+  block:
+    - name: List instances before create
+      gcore.cloud.instance_info:
+        api_token: "{{ api_token }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_result_before
+    
+    - name: Create new test instance
+      gcore.cloud.instance:
+        api_token: "{{ api_token }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        names: ["{{ instance_name }}"]
+        flavor: "{{ instance_flavor }}"
+        volumes: "{{ instance_volumes }}"
+        interfaces: "{{ instance_interfaces }}"
+      register: create_result
+    
+    - name: Verify create task
+      ansible.builtin.assert:
+        that:
+          - create_result.data["tasks"] | list | length == 1
+    
+    - name: Wait for instance
+      ansible.builtin.pause:
+        minutes: 2
+    
+    - name: List instances after creation
+      gcore.cloud.instance_info:
+        api_token: "{{ api_token }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_result_after
+    
+    - name: Check instances list length
+      ansible.builtin.assert:
+        that:
+          - list_result_after.data | length == list_result_before.data | length + 1
+    
+    - name: Find instance by name
+      gcore.cloud.instance_info:
+        api_token: "{{ api_token }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        name: "{{ instance_name }}"
+      register: find_result
+
+    - name: Verify instance
+      ansible.builtin.assert:
+        that:
+          - find_result.data | list | length == 1
+          - find_result.data[0]['instance_name'] == "{{ instance_name }}"
+          - find_result.data[0]['flavor']['flavor_name'] == "{{ instance_flavor }}"
+
+    - name: Rename instance
+      gcore.cloud.instance:
+        api_token: "{{ api_token }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        name: "{{ new_instance_name }}"
+        instance_id: "{{ find_result.data[0]['instance_id'] }}"
+
+    - name: Find instance by id
+      gcore.cloud.instance_info:
+        api_token: "{{ api_token }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        instance_id: "{{ find_result.data[0]['instance_id'] }}"
+      register: find_result
+    
+    - name: Verify name updated
+      ansible.builtin.assert:
+        that:
+          - find_result.data['instance_name'] == "{{ new_instance_name }}"
