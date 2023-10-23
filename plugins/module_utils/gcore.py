@@ -1,13 +1,17 @@
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 
 from .api import GCoreAPIClient
+from .clients.volume import GCoreVolumeClient
 
 
 class AnsibleGCore:
-    def __init__(self, module: AnsibleModule, resource: str) -> None:
+    def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        self.resource = resource
         self.client = GCoreAPIClient(module)
+
+    @property
+    def volumes(self) -> GCoreVolumeClient:
+        return GCoreVolumeClient(self.module, "v1/volumes/")
 
     @staticmethod
     def get_api_spec() -> dict:
@@ -21,7 +25,7 @@ class AnsibleGCore:
             api_endpoint=dict(
                 type="str",
                 fallback=(env_fallback, ["GCORE_API_ENDPOINT"]),
-                default="https://api.gcore.com/cloud/",
+                default="https://api.gcore.com/cloud",
             ),
             api_timeout=dict(
                 type="int",
