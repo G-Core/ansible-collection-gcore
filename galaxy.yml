@@ -1,0 +1,37 @@
+namespace: gcore
+name: cloud
+version: 1.0.0
+readme: README.md
+authors:
+- GCore (@GCore)
+
+description: A variety of Ansible content to help automate the management of Gcore services.
+
+license:
+- GPL-3.0-or-later
+
+tags: [gcore, cloud]
+
+# Collections that this collection requires to be installed for it to be usable. The key of the dict is the
+# collection label 'namespace.name'. The value is a version range
+# L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
+# range specifiers can be set and are separated by ','
+dependencies: {}
+
+# The URL of the originating SCM repository
+repository: http://example.com/repository
+
+# The URL to any online docs
+documentation: http://docs.example.com
+
+# The URL to the homepage of the collection/project
+homepage: http://example.com
+
+# The URL to the collection issue tracker
+issues: http://example.com/issue/tracker
+
+# A list of file glob-like patterns used to filter any files or directories that should not be included in the build
+# artifact. A pattern is matched from the relative path of the file or directory of the collection directory. This
+# uses 'fnmatch' to match the files or directories. Some directories and files like 'galaxy.yml', '*.pyc', '*.retry',
+# and '.git' are always filtered. Mutually exclusive with 'manifest'
+build_ignore: []

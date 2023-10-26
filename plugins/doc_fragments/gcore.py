@@ -1,7 +1,7 @@
 class ModuleDocFragment:
     DOCUMENTATION = r"""
 options:
-    api_endpoint:
+    api_host:
         description:
             - GCore API base endpoint
         type: str

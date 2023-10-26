@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-module: gcore_image_info
+module: image_info
 author:
     - GCore (@GCore)
 short_description: Gather infos about all GCore images.
@@ -44,22 +44,22 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-    - community.gcore.gcore.documentation
+    - gcore.cloud.documentation
 """
 
 EXAMPLES = """
 - name: Gather gcore image infos
-  community.gcore.gcore_image_info:
+  gcore.cloud.image_info:
     api_token: "{{ api_token }}"
 
 - name: Gather gcore specific image info
-  community.gcore.gcore_image_info:
+  gcore.cloud.image_info:
     image_id: "{{ image_id }}"
     api_token: "{{ api_token }}"
 """
 
 RETURN = """
-gcore_image_info:
+image_info:
     description:
         - When I(image_id) is passed, it is a dict of resource.
         - Otherwise it is a list of dictionaries.
@@ -226,8 +226,7 @@ gcore_image_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-
-from ..module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
 
 
 def manage(module: AnsibleModule):

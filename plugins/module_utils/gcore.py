@@ -1,8 +1,11 @@
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-
-from .api import GCoreAPIClient
-from .clients.image import GCoreImageClient
-from .clients.volume import GCoreVolumeClient
+from ansible_collections.gcore.cloud.plugins.module_utils.api import GCoreAPIClient
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.image import (
+    GCoreImageClient,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.volume import (
+    GCoreVolumeClient,
+)
 
 
 class AnsibleGCore:
@@ -27,9 +30,9 @@ class AnsibleGCore:
                 no_log=True,
                 required=True,
             ),
-            api_endpoint=dict(
+            api_host=dict(
                 type="str",
-                fallback=(env_fallback, ["GCORE_API_ENDPOINT"]),
+                fallback=(env_fallback, ["GCORE_API_HOST"]),
                 default="https://api.gcore.com/cloud",
             ),
             api_timeout=dict(

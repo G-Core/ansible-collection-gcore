@@ -2,25 +2,30 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
-from .base import BaseResource
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.base import (
+    BaseResource,
+)
 
 
-class VolumeSourceEnum(str, Enum):
+class VolumeSource(str, Enum):
     NEW_VOLUME = "new-volume"
     IMAGE = "image"
     SNAPSHOT = "snapshot"
 
 
+class VolumeType(str, Enum):
+    STANDARD = "standard"
+    SSD_HIIOPS = "ssd_hiiops"
+    COLD = "cold"
+    ULTRA = "ultra"
+
+
 @dataclass
 class CreateVolume(BaseResource):
-    # required
     name: str
     size: int
-
-    source: str = VolumeSourceEnum.NEW_VOLUME.value
-    type_name: str = "standard"
-
-    # optional
+    source: VolumeSource = VolumeSource.NEW_VOLUME
+    type_name: VolumeType = VolumeType.STANDARD
     instance_id_to_attach_to: Optional[str] = None
     attachment_tag: Optional[str] = None
     lifecycle_policy_ids: Optional[List[int]] = None
@@ -29,12 +34,12 @@ class CreateVolume(BaseResource):
 
 class CreateVolumeFromImage(CreateVolume):
     image_id: str
-    source: str = VolumeSourceEnum.IMAGE.value
+    source: VolumeSource = VolumeSource.IMAGE
 
 
 class CreateVolumeFromSnapshot(CreateVolume):
     snapshot_id: str
-    source: str = VolumeSourceEnum.SNAPSHOT.value
+    source: VolumeSource = VolumeSource.SNAPSHOT
 
 
 @dataclass
@@ -49,13 +54,7 @@ class DeleteVolume(BaseResource):
 
 
 @dataclass
-class AttachVolume(BaseResource):
-    volume_id: str
-    instance_id: str
-
-
-@dataclass
-class DetachVolume(BaseResource):
+class VolumeInstanceAction(BaseResource):
     volume_id: str
     instance_id: str
 
@@ -68,4 +67,5 @@ class ExtendVolume(BaseResource):
 
 @dataclass
 class RetypeVolume(BaseResource):
+    volume_id: str
     volume_type: str
