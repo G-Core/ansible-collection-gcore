@@ -1,0 +1,15 @@
+---
+- name: Run tasks locally
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - ./config.yml
+
+  tasks:
+    - name: Preconditions
+      import_tasks: ./targets/common_checks.yml
+    - name: Run image info tasks
+      import_tasks: ./targets/image_info/tasks/main.yml
+    - name: Run volume tasks
+      import_tasks: ./targets/volume/tasks/main.yml

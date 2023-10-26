@@ -1,3 +1,5 @@
+import http
+from http import HTTPStatus
 from typing import Any, Optional
 from urllib.parse import urlencode, urljoin
 
@@ -12,23 +14,24 @@ class GCoreAPIClient:
         self.api_timeout = module.params["api_timeout"]
         self.project_id = module.params["project_id"]
         self.region_id = module.params["region_id"]
-        self.api_endpoint = self._set_api_endpoint()
+        self.api_host = self._set_api_host()
 
     def get(self, url: str, **kwargs) -> Optional[str]:
-        return self._request(method="GET", url=url, data=None, **kwargs)
+        return self._request(method=http.HTTPMethod.GET, url=url, data=None, **kwargs)
 
     def post(self, url: str, data: Any, **kwargs) -> Optional[str]:
-        return self._request(method="POST", url=url, data=data, **kwargs)
+        return self._request(method=http.HTTPMethod.POST, url=url, data=data, **kwargs)
 
     def patch(self, url: str, data: Any, **kwargs) -> Optional[str]:
-        return self._request(method="PATCH", url=url, data=data, **kwargs)
+        return self._request(method=http.HTTPMethod.PATCH, url=url, data=data, **kwargs)
 
     def delete(self, url: str, **kwargs) -> Optional[str]:
-        return self._request(method="DELETE", url=url, data=None, **kwargs)
+        kwargs.pop("data", None)
+        return self._request(method=http.HTTPMethod.DELETE, url=url, data=None, **kwargs)
 
-    def _set_api_endpoint(self) -> str:
-        api_endpoint = self.module.params["api_endpoint"]
-        return api_endpoint + "/" if not api_endpoint.endswith("/") else api_endpoint
+    def _set_api_host(self) -> str:
+        api_host = self.module.params["api_host"]
+        return api_host + "/" if not api_host.endswith("/") else api_host
 
     def _get_headers(self) -> dict:
         return {
@@ -37,11 +40,12 @@ class GCoreAPIClient:
         }
 
     def _build_url(self, url: str, **kwargs) -> str:
-        handler = f"{self.api_endpoint}{url}{self.project_id}/{self.region_id}"
+        base_url = f"{self.api_host}{url}{self.project_id}/{self.region_id}"
         path = kwargs.get("path")
         query = kwargs.get("query")
+        handler = base_url
         if path:
-            handler = urljoin(handler + "/", path)
+            handler = urljoin(base_url + "/", path)
         if query:
             query_str = urlencode(query)
             handler = f"{handler}?{query_str}"
@@ -50,9 +54,9 @@ class GCoreAPIClient:
     def _parse_response(self, response: Any, info: dict) -> Optional[str]:
         """Parse the API response based on the HTTP status code"""
         status_code = info["status"]
-        if status_code == 200:
+        if status_code == HTTPStatus.OK:
             response = self._parse_successful_response(response)
-        elif status_code == 204:
+        elif status_code == HTTPStatus.NO_CONTENT:
             return None
         else:
             self._handle_failed_response(info)

@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-module: gcore_volume_info
+module: volume_info
 author:
     - GCore (@GCore)
 short_description: Gather infos about all GCore volumes.
@@ -68,22 +68,22 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-    - community.gcore.gcore.documentation
+    - gcore.cloud.gcore.documentation
 """
 
 EXAMPLES = """
 - name: Gather gcore volume infos
-  community.gcore.gcore_volume_info:
+  gcore.cloud.volume_info:
     api_token: "{{ api_token }}"
 
 - name: Gather gcore specific volume info
-  community.gcore.gcore_volume_info:
+  gcore.cloud.volume_info:
     volume_id: "{{ volume_id }}"
     api_token: "{{ api_token }}"
 """
 
 RETURN = """
-gcore_volume_info:
+volume_info:
     description:
         - When I(volume_id) is passed, it is a dict of resource.
         - Otherwise it is a list of dictionaries.
@@ -231,8 +231,7 @@ gcore_volume_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-
-from ..module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
 
 
 def manage(module: AnsibleModule):

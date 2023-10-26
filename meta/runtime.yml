@@ -1,1 +1,7 @@
+---
 requires_ansible: ">=2.13.0"
+action_groups:
+  cloud:
+    - volume
+    - volume_info
+    - image_info

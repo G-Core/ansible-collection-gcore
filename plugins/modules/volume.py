@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-module: gcore_volume
+module: volume
 author:
     - GCore (@GCore)
 short_description: Manages volumes
@@ -83,12 +83,12 @@ options:
             - Required if I(command) is create
         type: str
 extends_documentation_fragment:
-    - community.gcore.gcore.documentation
+    - gcore.cloud.gcore.documentation
 """
 
 EXAMPLES = """
 - name: Create a new empty volume
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: create
     source: new-volume
@@ -97,7 +97,7 @@ EXAMPLES = """
     size: 2
 
 - name: Create a new volume from image
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: create
     source: image
@@ -106,34 +106,34 @@ EXAMPLES = """
     size: 5
 
 - name: Extend existing volume
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: extend
     volume_id: "{{ volume_id }}"
     size: 20
 
 - name: Attach existing volume to instance
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: attach
     volume_id: "{{ volume_id }}"
     instance_id: "{{ instance_id }}"
 
 - name: Detach existing volume from instance
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: detach
     volume_id: "{{ volume_id }}"
     instance_id: "{{ instance_id }}"
 
 - name: Delete existing volume
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: delete
     volume_id: "{{ volume_id }}"
 
 - name: Update existing volume's name
-  community.gcore.gcore_volume:
+  gcore.cloud.volume:
     api_token: "{{ api_token }}"
     command: update
     volume_id: "{{ volume_id }}"
@@ -141,7 +141,7 @@ EXAMPLES = """
 """
 
 RETURN = """
-gcore_volume:
+volume:
     description:
         - Response depends of I(command).
         - If I(command) is one of create or delete then response will be list of tasks.
@@ -290,14 +290,20 @@ gcore_volume:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-
-from ..module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.volume import (
+    VolumeSource,
+    VolumeType,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.volume import (
+    VolumeAction,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
 
 
 def manage(module: AnsibleModule):
     api = AnsibleGCore(module)
     command = module.params.pop("command")
-    result = api.volumes.do_action(command=command, params=module.params)
+    result = api.volumes.execute_command(command=command, params=module.params)
     module.exit_json(changed=True, data=result)
 
 
@@ -305,7 +311,7 @@ def main():
     module_spec = dict(
         command=dict(
             type="str",
-            choices=["create", "update", "delete", "attach", "detach", "extend", "retype"],
+            choices=list(VolumeAction),
             required=True,
         ),
         volume_id=dict(
@@ -314,7 +320,7 @@ def main():
         ),
         type_name=dict(
             type="str",
-            choices=["standard", "ssd_hiiops", "cold", "ultra"],
+            choices=list(VolumeType),
             required=False,
         ),
         name=dict(
@@ -342,7 +348,7 @@ def main():
         ),
         source=dict(
             type="str",
-            choices=["image", "snapshot", "new-volume"],
+            choices=list(VolumeSource),
             required=False,
         ),
         image_id=dict(
