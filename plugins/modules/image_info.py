@@ -44,7 +44,7 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.documentation
+    - gcore.cloud.gcore.documentation
 """
 
 EXAMPLES = """

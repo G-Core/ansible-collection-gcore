@@ -27,13 +27,13 @@ class BaseResourceClient:
             self.module.fail_json(msg=f"Unknown command {command}")
         self.module.fail_on_missing_params(required_params=config.get("required_params", []))
         data = self._clear_params(params)
-        path = self._prepare_path(config["path"], data)
+        path = self._prepare_path(config.get("path", ""), data)
         method = getattr(self.api_client, config["method"])
         url = config.get("url") or self.url
         return method(url=url, path=path, data=data)
 
     def _prepare_path(self, path: str, data: dict) -> str:
-        path_params = [f for _, f, _, _ in Formatter().parse(path) if f is not None]
+        path_params = [f for _, f, _, _ in Formatter().parse(path) if f is not None]  # pylint: disable=C0104
         params = {k: data.pop(k) for k in path_params}
         return path.format(**params)
 

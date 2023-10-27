@@ -17,5 +17,7 @@
       import_tasks: ./targets/instance_info/tasks/main.yml
     - name: Run instance tasks
       import_tasks: ./targets/instance/tasks/main.yml
-    - name: Clean up test resources
-      import_tasks: ./targets/cleanup.yml
+    - name: Run network info tasks
+      import_tasks: ./targets/network_info/tasks/main.yml
+    - name: Run network tasks
+      import_tasks: ./targets/network/tasks/main.yml

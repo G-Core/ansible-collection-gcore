@@ -133,7 +133,7 @@ options:
         type: bool
         required: false
 extends_documentation_fragment:
-    - gcore.cloud..documentation
+    - gcore.cloud.gcore.documentation
 """
 
 EXAMPLES = """
@@ -323,11 +323,11 @@ from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGC
 
 def manage(module: AnsibleModule):
     api = AnsibleGCore(module)
-    instance_id = module.params.get("instance_id")
+    instance_id = module.params.pop("instance_id", None)
     if instance_id:
         result = api.instances.get_by_id(instance_id)
     else:
-        result = api.instances.get_list()
+        result = api.instances.get_list(**module.params)
     module.exit_json(changed=False, data=result)
 
 

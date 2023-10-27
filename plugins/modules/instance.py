@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-module: instance_info
+module: instance
 author:
     - GCore (@GCore)
 short_description: Manages instances.
@@ -29,7 +29,7 @@ options:
         type: str
         required: false
     flavor:
-        descitprion:
+        description:
             - Flavor ID.
             - Required if I(command) is create.
         type: str
@@ -98,7 +98,7 @@ options:
             - Required if I(command) is create.
             - Optional if I(command) is delete.
         type: list
-        elements: str
+        elements: dict
         required: false
     security_groups:
         description:
@@ -147,7 +147,7 @@ options:
         type: bool
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.documentation
+    - gcore.cloud.gcore.documentation
 """
 
 EXAMPLES = """
@@ -183,10 +183,10 @@ instance_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.instance import (
     InstanceAction,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
 
 
 def manage(module: AnsibleModule):
@@ -221,6 +221,7 @@ def main():
         ),
         password=dict(
             type="str",
+            no_log=True,
             required=False,
         ),
         instance_id=dict(
