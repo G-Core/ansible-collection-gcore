@@ -4,6 +4,8 @@ action_groups:
   cloud:
     - instance
     - instance_info
+    - network
+    - network_info
     - volume
     - volume_info
     - image_info

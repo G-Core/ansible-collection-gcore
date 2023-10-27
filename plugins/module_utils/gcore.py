@@ -6,6 +6,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.image import (
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.instance import (
     GCoreInstanceClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
+    GCoreNetworkClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.volume import (
     GCoreVolumeClient,
 )
@@ -27,6 +30,10 @@ class AnsibleGCore:
     @property
     def instances(self) -> GCoreInstanceClient:
         return GCoreInstanceClient(self.module, "v1/instances/")
+
+    @property
+    def networks(self) -> GCoreNetworkClient:
+        return GCoreNetworkClient(self.module, "v1/networks/")
 
     @staticmethod
     def get_api_spec() -> dict:
