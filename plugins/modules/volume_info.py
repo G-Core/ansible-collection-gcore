@@ -236,11 +236,11 @@ from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGC
 
 def manage(module: AnsibleModule):
     api = AnsibleGCore(module)
-    volume_id = module.params.get("volume_id")
+    volume_id = module.params.pop("volume_id", None)
     if volume_id:
         result = api.volumes.get_by_id(volume_id)
     else:
-        result = api.volumes.get_list()
+        result = api.volumes.get_list(**module.params)
     module.exit_json(changed=False, data=result)
 
 

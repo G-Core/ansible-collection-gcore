@@ -1,4 +1,3 @@
-import http
 from http import HTTPStatus
 from typing import Any, Optional
 from urllib.parse import urlencode, urljoin
@@ -17,17 +16,17 @@ class GCoreAPIClient:
         self.api_host = self._set_api_host()
 
     def get(self, url: str, **kwargs) -> Optional[str]:
-        return self._request(method=http.HTTPMethod.GET, url=url, data=None, **kwargs)
+        return self._request(method="GET", url=url, data=None, **kwargs)
 
     def post(self, url: str, data: Any, **kwargs) -> Optional[str]:
-        return self._request(method=http.HTTPMethod.POST, url=url, data=data, **kwargs)
+        return self._request(method="POST", url=url, data=data, **kwargs)
 
     def patch(self, url: str, data: Any, **kwargs) -> Optional[str]:
-        return self._request(method=http.HTTPMethod.PATCH, url=url, data=data, **kwargs)
+        return self._request(method="PATCH", url=url, data=data, **kwargs)
 
     def delete(self, url: str, **kwargs) -> Optional[str]:
         kwargs.pop("data", None)
-        return self._request(method=http.HTTPMethod.DELETE, url=url, data=None, **kwargs)
+        return self._request(method="DELETE", url=url, data=None, **kwargs)
 
     def _set_api_host(self) -> str:
         api_host = self.module.params["api_host"]

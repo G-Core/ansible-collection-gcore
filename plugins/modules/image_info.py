@@ -231,11 +231,11 @@ from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGC
 
 def manage(module: AnsibleModule):
     api = AnsibleGCore(module)
-    image_id = module.params.get("image_id")
+    image_id = module.params.pop("image_id", None)
     if image_id:
         result = api.images.get_by_id(image_id)
     else:
-        result = api.images.get_list()
+        result = api.images.get_list(**module.params)
     module.exit_json(changed=False, data=result)
 
 
