@@ -6,6 +6,8 @@ action_groups:
     - instance_info
     - network
     - network_info
+    - snapshot
+    - snapshot_info
     - volume
     - volume_info
     - image_info

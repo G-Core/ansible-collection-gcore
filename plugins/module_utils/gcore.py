@@ -9,6 +9,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.instance impor
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
     GCoreNetworkClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.snapshot import (
+    GCoreSnapshotClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.volume import (
     GCoreVolumeClient,
 )
@@ -34,6 +37,10 @@ class AnsibleGCore:
     @property
     def networks(self) -> GCoreNetworkClient:
         return GCoreNetworkClient(self.module, "v1/networks/")
+
+    @property
+    def snapshots(self) -> GCoreSnapshotClient:
+        return GCoreSnapshotClient(self.module, "v1/snapshots/")
 
     @staticmethod
     def get_api_spec() -> dict:

@@ -21,3 +21,7 @@
       import_tasks: ./targets/network_info/tasks/main.yml
     - name: Run network tasks
       import_tasks: ./targets/network/tasks/main.yml
+    - name: Run snapshot info tasks
+      import_tasks: ./targets/snapshot_info/tasks/main.yml
+    - name: Run snapshot tasks
+      import_tasks: ./targets/snapshot/tasks/main.yml
