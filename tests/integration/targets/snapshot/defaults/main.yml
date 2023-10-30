@@ -1,0 +1,4 @@
+---
+volume_source: new-volume
+volume_name: test-volume-from-ansible
+volume_size: 1

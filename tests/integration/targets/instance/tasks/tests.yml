@@ -93,3 +93,7 @@
       ansible.builtin.assert:
         that:
           - find_result.data['instance_name'] == "{{ new_instance_name }}"
+
+  always:
+    - name: Cleanup instances
+      import_tasks: ./targets/common/tasks/cleanup_instances.yml
