@@ -28,10 +28,10 @@ To run it, provide required config variables under `tests/integration/config.yml
 
 | key              | value                 |
 |------------------|-----------------------|
-| GCORE_API_KEY    | Yor api key           |
-| GCORE_API_HOST   | Your local api url    |
-| GCORE_PROJECT_ID | Your local project ID |
-| GCORE_REGION_ID  | ED-10 region ID       |
+| API_KEY    | Yor api key           |
+| API_HOST   | Your local api url    |
+| PROJECT_ID | Your local project ID |
+| REGION_ID  | ED-10 region ID       |
 
 and from the `tests/integration` dir execute the command:
 

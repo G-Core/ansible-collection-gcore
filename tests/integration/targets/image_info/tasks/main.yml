@@ -2,18 +2,18 @@
 - block:
     - name: Gather information about all images
       gcore.cloud.image_info:
-        api_key: "{{ GCORE_API_KEY }}"
-        api_host: "{{ GCORE_API_HOST }}"
-        project_id: "{{ GCORE_PROJECT_ID | int }}"
-        region_id: "{{ GCORE_REGION_ID | int }}"
+        api_key: "{{ API_KEY }}"
+        api_host: "{{ API_HOST }}"
+        project_id: "{{ PROJECT_ID | int }}"
+        region_id: "{{ REGION_ID | int }}"
       register: result
     
     - name: Gather information about specific image by ID
       gcore.cloud.image_info:
-        api_key: "{{ GCORE_API_KEY }}"
-        api_host: "{{ GCORE_API_HOST }}"
-        project_id: "{{ GCORE_PROJECT_ID }}"
-        region_id: "{{ GCORE_REGION_ID }}"
+        api_key: "{{ API_KEY }}"
+        api_host: "{{ API_HOST }}"
+        project_id: "{{ PROJECT_ID }}"
+        region_id: "{{ REGION_ID }}"
         image_id: "{{ result.data[0]['id'] }}"
       register: result
 

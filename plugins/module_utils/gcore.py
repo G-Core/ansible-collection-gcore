@@ -47,28 +47,28 @@ class AnsibleGCore:
         return dict(
             api_key=dict(
                 type="str",
-                fallback=(env_fallback, ["GCORE_API_KEY"]),
+                fallback=(env_fallback, ["API_KEY"]),
                 no_log=True,
                 required=True,
             ),
             api_host=dict(
                 type="str",
-                fallback=(env_fallback, ["GCORE_API_HOST"]),
+                fallback=(env_fallback, ["API_HOST"]),
                 default="https://api.gcore.com/cloud",
             ),
             api_timeout=dict(
                 type="int",
-                fallback=(env_fallback, ["GCORE_API_TIMEOUT"]),
+                fallback=(env_fallback, ["API_TIMEOUT"]),
                 default=30,
             ),
             project_id=dict(
                 type="int",
                 required=True,
-                fallback=(env_fallback, ["GCORE_PROJECT_ID"]),
+                fallback=(env_fallback, ["PROJECT_ID"]),
             ),
             region_id=dict(
                 type="int",
                 required=True,
-                fallback=(env_fallback, ["GCORE_REGION_ID"]),
+                fallback=(env_fallback, ["REGION_ID"]),
             ),
         )
