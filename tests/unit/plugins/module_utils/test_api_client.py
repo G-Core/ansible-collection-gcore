@@ -16,7 +16,7 @@ class TestApiClient(unittest.TestCase):
         self.project_id = 100
         self.region_id = 10
         params = {
-            "api_token": "test_api_token",
+            "api_key": "test_api_key",
             "api_timeout": 60,
             "project_id": self.project_id,
             "region_id": self.region_id,
@@ -26,7 +26,7 @@ class TestApiClient(unittest.TestCase):
         self.api_client = GCoreAPIClient(self.module)
 
     def test_module_params(self):
-        self.assertEqual(self.api_client.api_token, "test_api_token")
+        self.assertEqual(self.api_client.api_key, "test_api_key")
         self.assertEqual(self.api_client.api_timeout, 60)
         self.assertEqual(self.api_client.project_id, self.project_id)
         self.assertEqual(self.api_client.region_id, self.region_id)

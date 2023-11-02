@@ -139,12 +139,12 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Gather gcore instances infos
   gcore.cloud.instance_info:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 
 - name: Gather gcore specific instance info
   gcore.cloud.gcore_instance_info:
     instance_id: "{{ instance_id }}"
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 """
 
 RETURN = """

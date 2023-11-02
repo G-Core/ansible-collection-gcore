@@ -74,12 +74,12 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Gather gcore volume infos
   gcore.cloud.volume_info:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 
 - name: Gather gcore specific volume info
   gcore.cloud.volume_info:
     volume_id: "{{ volume_id }}"
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 """
 
 RETURN = """

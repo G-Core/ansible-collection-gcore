@@ -1,9 +1,9 @@
 - name: Ensure API key is provided
   ansible.builtin.fail:
-    msg: GCORE_API_TOKEN should be defined in tests/integration/integration_config.yml
+    msg: GCORE_API_KEY should be defined in tests/integration/integration_config.yml
   when:
-    - GCORE_API_TOKEN is not defined
-    - GCORE_API_TOKEN | length == 0
+    - GCORE_API_KEY is not defined
+    - GCORE_API_KEY | length == 0
 
 - name: Ensure project id is provided
   ansible.builtin.fail:

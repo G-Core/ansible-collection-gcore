@@ -2,7 +2,7 @@
 - block:
     - name: Gather information about all images
       gcore.cloud.image_info:
-        api_token: "{{ GCORE_API_TOKEN }}"
+        api_key: "{{ GCORE_API_KEY }}"
         api_host: "{{ GCORE_API_HOST }}"
         project_id: "{{ GCORE_PROJECT_ID | int }}"
         region_id: "{{ GCORE_REGION_ID | int }}"
@@ -10,7 +10,7 @@
     
     - name: Gather information about specific image by ID
       gcore.cloud.image_info:
-        api_token: "{{ GCORE_API_TOKEN }}"
+        api_key: "{{ GCORE_API_KEY }}"
         api_host: "{{ GCORE_API_HOST }}"
         project_id: "{{ GCORE_PROJECT_ID }}"
         region_id: "{{ GCORE_REGION_ID }}"

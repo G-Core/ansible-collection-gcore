@@ -3,7 +3,7 @@ from string import Formatter
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.gcore.cloud.plugins.module_utils.api import GCoreAPIClient
 
-GLOBAL_PARAMS = ["api_host", "api_token", "api_timeout", "project_id", "region_id"]
+GLOBAL_PARAMS = ["api_host", "api_key", "api_timeout", "project_id", "region_id"]
 
 
 class BaseResourceClient:
