@@ -153,7 +153,7 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Create instance from volume
   gcore.cloud.instance:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     names: [Test]
     flavor: g1-standard-1-2
     volumes: [{

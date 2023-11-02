@@ -59,7 +59,7 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Create new snapshot
   gcore.cloud.snapshot:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: create
     volume_id: "67baa7d1-08ea-4fc5-bef2-6b2465b7d227"
     name: "test-snap"
@@ -67,7 +67,7 @@ EXAMPLES = """
 
 - name: Delete snapshot
   gcore.cloud.snapshot:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: delete
     snapshot_id: "481797e0-472b-439e-86df-5b651279015d"
 """

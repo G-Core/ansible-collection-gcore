@@ -60,12 +60,12 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Gather gcore network infos
   gcore.cloud.network:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 
 - name: Gather gcore specific network info
   gcore.cloud.network:
     network_id: "{{ network_id }}"
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 """
 
 RETURN = """

@@ -59,12 +59,12 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Gather gcore snapshot infos
   gcore.cloud.snapshot_info:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 
 - name: Gather gcore snapshots info for specific volume
   gcore.cloud.snapshot_info:
     volume_id: "{{ volume_id }}"
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 """
 
 RETURN = """

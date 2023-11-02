@@ -89,7 +89,7 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Create a new empty volume
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: create
     source: new-volume
     type_name: standard
@@ -98,7 +98,7 @@ EXAMPLES = """
 
 - name: Create a new volume from image
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: create
     source: image
     type_name: standard
@@ -107,34 +107,34 @@ EXAMPLES = """
 
 - name: Extend existing volume
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: extend
     volume_id: "{{ volume_id }}"
     size: 20
 
 - name: Attach existing volume to instance
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: attach
     volume_id: "{{ volume_id }}"
     instance_id: "{{ instance_id }}"
 
 - name: Detach existing volume from instance
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: detach
     volume_id: "{{ volume_id }}"
     instance_id: "{{ instance_id }}"
 
 - name: Delete existing volume
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: delete
     volume_id: "{{ volume_id }}"
 
 - name: Update existing volume's name
   gcore.cloud.volume:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
     command: update
     volume_id: "{{ volume_id }}"
     name: new-volume-name

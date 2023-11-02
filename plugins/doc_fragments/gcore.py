@@ -3,12 +3,12 @@ class ModuleDocFragment:
 options:
     api_host:
         description:
-            - GCore API base endpoint
+            - GCore API base host
         type: str
         default: https://api.gcore.com/cloud
-    api_token:
+    api_key:
         description:
-            - GCore API auth token
+            - GCore API auth key
         type: str
         required: true
     api_timeout:

@@ -45,9 +45,9 @@ class AnsibleGCore:
     @staticmethod
     def get_api_spec() -> dict:
         return dict(
-            api_token=dict(
+            api_key=dict(
                 type="str",
-                fallback=(env_fallback, ["GCORE_API_TOKEN"]),
+                fallback=(env_fallback, ["GCORE_API_KEY"]),
                 no_log=True,
                 required=True,
             ),

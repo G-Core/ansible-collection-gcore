@@ -1,6 +1,6 @@
 ---
 - vars:
-    api_token: "{{ GCORE_API_TOKEN }}"
+    api_key: "{{ GCORE_API_KEY }}"
     api_host: "{{ GCORE_API_HOST }}"
     project_id: "{{ GCORE_PROJECT_ID }}"
     region_id: "{{ GCORE_REGION_ID }}"
@@ -11,7 +11,7 @@
   block:
     - name: List volumes before creation
       gcore.cloud.volume_info:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -19,7 +19,7 @@
 
     - name: Create new volume
       gcore.cloud.volume:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -40,7 +40,7 @@
 
     - name: List volumes after creation
       gcore.cloud.volume_info:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -53,7 +53,7 @@
 
     - name: Find volume by name
       gcore.cloud.volume_info:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -62,7 +62,7 @@
 
     - name: Update existing volume's name
       gcore.cloud.volume:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -72,7 +72,7 @@
 
     - name: Find volume by id
       gcore.cloud.volume_info:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -86,7 +86,7 @@
 
     - name: Extend existing volume
       gcore.cloud.volume:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -106,7 +106,7 @@
 
     - name: Find volume by id
       gcore.cloud.volume_info:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
@@ -121,7 +121,7 @@
   always:
     - name: Delete test volume
       gcore.cloud.volume:
-        api_token: "{{ api_token }}"
+        api_key: "{{ api_key }}"
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"

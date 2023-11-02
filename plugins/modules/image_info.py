@@ -50,12 +50,12 @@ extends_documentation_fragment:
 EXAMPLES = """
 - name: Gather gcore image infos
   gcore.cloud.image_info:
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 
 - name: Gather gcore specific image info
   gcore.cloud.image_info:
     image_id: "{{ image_id }}"
-    api_token: "{{ api_token }}"
+    api_key: "{{ api_key }}"
 """
 
 RETURN = """

@@ -9,7 +9,7 @@ from ansible.module_utils.urls import fetch_url, to_text
 class GCoreAPIClient:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        self.api_token = module.params["api_token"]
+        self.api_key = module.params["api_key"]
         self.api_timeout = module.params["api_timeout"]
         self.project_id = module.params["project_id"]
         self.region_id = module.params["region_id"]
@@ -35,7 +35,7 @@ class GCoreAPIClient:
     def _get_headers(self) -> dict:
         return {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_token}",
+            "Authorization": f"APIKey {self.api_key}",
         }
 
     def _build_url(self, url: str, **kwargs) -> str:
