@@ -1,9 +1,9 @@
 ---
 - vars:
-    api_key: "{{ GCORE_API_KEY }}"
-    api_host: "{{ GCORE_API_HOST }}"
-    project_id: "{{ GCORE_PROJECT_ID }}"
-    region_id: "{{ GCORE_REGION_ID }}"
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
     instance_name: test_ansible_instance
     new_instance_name: test_ansible_instance_2
     instance_flavor: g1-standard-1-2

@@ -2,10 +2,10 @@
 - block:
     - name: Gather information about all networks
       gcore.cloud.network_info:
-        api_key: "{{ GCORE_API_KEY }}"
-        api_host: "{{ GCORE_API_HOST }}"
-        project_id: "{{ GCORE_PROJECT_ID | int }}"
-        region_id: "{{ GCORE_REGION_ID | int }}"
+        api_key: "{{ API_KEY }}"
+        api_host: "{{ API_HOST }}"
+        project_id: "{{ PROJECT_ID | int }}"
+        region_id: "{{ REGION_ID | int }}"
       register: result
     
     - name: Verify list networks

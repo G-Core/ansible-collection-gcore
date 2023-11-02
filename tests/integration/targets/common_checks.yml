@@ -1,20 +1,20 @@
 - name: Ensure API key is provided
   ansible.builtin.fail:
-    msg: GCORE_API_KEY should be defined in tests/integration/integration_config.yml
+    msg: API_KEY should be defined in tests/integration/integration_config.yml
   when:
-    - GCORE_API_KEY is not defined
-    - GCORE_API_KEY | length == 0
+    - API_KEY is not defined
+    - API_KEY | length == 0
 
 - name: Ensure project id is provided
   ansible.builtin.fail:
-    msg: GCORE_PROJECT_ID should be defined in tests/integration/integration_config.yml
+    msg: PROJECT_ID should be defined in tests/integration/integration_config.yml
   when:
-    - GCORE_PROJECT_ID is not defined
-    - GCORE_PROJECT_ID | length == 0
+    - PROJECT_ID is not defined
+    - PROJECT_ID | length == 0
 
 - name: Ensure region id is provided
   ansible.builtin.fail:
-    msg: GCORE_REGION_ID should be defined in tests/integration/integration_config.yml
+    msg: REGION_ID should be defined in tests/integration/integration_config.yml
   when:
-    - GCORE_REGION_ID is not defined
-    - GCORE_REGION_ID | length == 0
+    - REGION_ID is not defined
+    - REGION_ID | length == 0
