@@ -4,10 +4,13 @@ action_groups:
   cloud:
     - instance
     - instance_info
+    - instance_quota_info
     - network
     - network_info
-    - snapshot
-    - snapshot_info
+    - volume_snapshot
+    - volume_snapshot_info
     - volume
     - volume_info
     - image_info
+    - subnet
+    - subnet_info

@@ -22,6 +22,7 @@
         region_id: "{{ region_id }}"
         command: delete
         network_id: "{{ item.id }}"
+      ignore_errors: True
       when:
         - item.name.startswith('test_ansible')
       with_items: "{{ list_networks.data }}"

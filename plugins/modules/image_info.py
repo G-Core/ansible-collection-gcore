@@ -43,19 +43,40 @@ options:
             - Filter by metadata key-value pairs. Must be a valid JSON string
         type: str
         required: false
+    include_prices:
+        description:
+            - Show price
+        type: bool
+        required: false
+    project:
+        description:
+            - Show images owned by project
+        type: bool
+        required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
-- name: Gather gcore image infos
+- name: Gather gcore images info
   gcore.cloud.image_info:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
 
 - name: Gather gcore specific image info
   gcore.cloud.image_info:
-    image_id: "{{ image_id }}"
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    image_id: "{{ image_id }}"
+
+- name: Gather gcore images owned by project
+  gcore.cloud.image_info:
+    api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    project: true
 """
 
 RETURN = """
@@ -128,7 +149,7 @@ image_info:
             sample: 20.10
         task_id:
             description: Active task. If None, action has been performed immediately in the request itself
-            returned: present
+            returned: if available
             type: str
             sample: 907a87b0-7b63-4fd5-beb3-5ab4ba445c93
         visibility:
@@ -153,7 +174,7 @@ image_info:
             sample: 2361393152
         updated_at:
             description: Datetime when the image was updated
-            returned: changed
+            returned: if available
             type: str
             sample: 2020-12-18T14:51:20+0000
         created_at:
@@ -226,17 +247,19 @@ image_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
-    image_id = module.params.pop("image_id", None)
-    if image_id:
-        result = api.images.get_by_id(image_id)
-    else:
-        result = api.images.get_list(**module.params)
-    module.exit_json(changed=False, data=result)
+    api = AnsibleCloudClient(module)
+    image_id = module.params.get("image_id")
+    command = "get_by_id" if image_id else "get_list"
+    if module.params.pop("project", False):
+        command = "get_list_for_project"
+    result = api.images.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
@@ -262,10 +285,29 @@ def main():
             type="str",
             required=False,
         ),
+        include_prices=dict(
+            type="bool",
+            required=False,
+        ),
+        project=dict(
+            type="bool",
+            required=False,
+        ),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

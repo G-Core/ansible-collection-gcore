@@ -1,0 +1,30 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+
+  block:
+    - name: List all test subnets
+      gcore.cloud.subnet_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_subnets
+
+    - name: Delete all test subnets
+      gcore.cloud.subnet:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        subnet_id: "{{ item.id }}"
+      ignore_errors: True
+      when:
+        - item.name.startswith('test_ansible')
+      with_items: "{{ list_subnets.data }}"
+      loop_control:
+        label: "{{ item.name }} ({{ item.id }})"

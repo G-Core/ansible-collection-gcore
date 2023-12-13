@@ -6,27 +6,100 @@ from ansible.module_utils.basic import AnsibleModule, json
 from ansible.module_utils.urls import fetch_url, to_text
 
 
-class GCoreAPIClient:
+class CloudAPIClient:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.api_key = module.params["api_key"]
         self.api_timeout = module.params["api_timeout"]
-        self.project_id = module.params["project_id"]
-        self.region_id = module.params["region_id"]
         self.api_host = self._set_api_host()
+        self.project_id = self._set_project_id()
+        self.region_id = self._set_region_id()
 
-    def get(self, url: str, **kwargs) -> Optional[str]:
-        return self._request(method="GET", url=url, data=None, **kwargs)
+    def get(
+        self,
+        url: str,
+        path_params: Optional[str] = None,
+        query_params: Optional[dict] = None,
+        **kwargs,
+    ) -> Optional[str]:
+        kwargs.pop("data", None)
+        return self._request(url=url, path_params=path_params, query_params=query_params, data=None, **kwargs)
 
-    def post(self, url: str, data: Any, **kwargs) -> Optional[str]:
-        return self._request(method="POST", url=url, data=data, **kwargs)
+    def post(self, url: str, **kwargs) -> Optional[str]:
+        return self._request(method="POST", url=url, **kwargs)
 
-    def patch(self, url: str, data: Any, **kwargs) -> Optional[str]:
-        return self._request(method="PATCH", url=url, data=data, **kwargs)
+    def patch(self, url: str, **kwargs) -> Optional[str]:
+        return self._request(method="PATCH", url=url, **kwargs)
 
     def delete(self, url: str, **kwargs) -> Optional[str]:
         kwargs.pop("data", None)
         return self._request(method="DELETE", url=url, data=None, **kwargs)
+
+    def _request(
+        self,
+        url: str,
+        method: str = "GET",
+        path_params: Optional[str] = None,
+        query_params: Optional[dict] = None,
+        data: Optional[dict] = None,
+        **kwargs,
+    ):
+        url = f"{self.api_host}{url}"
+        if kwargs.get("include_project_region", True):
+            url += f"{self.project_id}/{self.region_id}"
+        data = self.module.jsonify(data) if data else None
+        if path_params:
+            url = urljoin(url + "/", path_params)
+        if query_params:
+            query_str = urlencode(query_params)
+            url = f"{url}?{query_str}"
+        response, info = fetch_url(
+            module=self.module,
+            url=url,
+            method=method,
+            data=data,
+            headers=self._get_headers(),
+            timeout=self.api_timeout,
+        )
+        return self._parse_response(response, info)
+
+    def _set_project_id(self):
+        project_id = self.module.params.get("project_id")
+        if project_id:
+            return project_id
+        project_name = self.module.params["project_name"]
+        response, info = fetch_url(
+            self.module, url=f"{self.api_host}v1/projects", method="GET", headers=self._get_headers()
+        )
+        for project in self._parse_response(response, info):
+            if project["name"] == project_name:
+                return project["id"]
+            self.module.fail_json(f"Project {project_name} not found")
+
+    def _set_region_id(self):
+        region_id = self.module.params.get("region_id")
+        if region_id:
+            return region_id
+        region_name = self.module.params["region_name"]
+        response, info = fetch_url(
+            self.module, url=f"{self.api_host}v1/regions", method="GET", headers=self._get_headers()
+        )
+        for project in self._parse_response(response, info):
+            if project["display_name"] == region_name:
+                return project["id"]
+        self.module.fail_json(f"Region {region_name} not found")
+
+    def _set_project_and_region(self):
+        params = [("project", "name"), ("region", "disply_name")]
+        for param in params:
+            type_, name_ = param
+            if not self.module.params.get(f"{type_}_id"):
+                name = self.module.params.get(f"{type_}_name")
+                response = self.get(url=f"v1/{type_}s", build_url=False)
+                for item in response:
+                    if item[name_] == name:
+                        return item["id"]
+                self.module.fail_json(msg=f"{type_.upper()} '{name}' not found. {response}")
 
     def _set_api_host(self) -> str:
         api_host = self.module.params["api_host"]
@@ -37,18 +110,6 @@ class GCoreAPIClient:
             "Content-Type": "application/json",
             "Authorization": f"APIKey {self.api_key}",
         }
-
-    def _build_url(self, url: str, **kwargs) -> str:
-        base_url = f"{self.api_host}{url}{self.project_id}/{self.region_id}"
-        path = kwargs.get("path")
-        query = kwargs.get("query")
-        handler = base_url
-        if path:
-            handler = urljoin(base_url + "/", path)
-        if query:
-            query_str = urlencode(query)
-            handler = f"{handler}?{query_str}"
-        return handler
 
     def _parse_response(self, response: Any, info: dict) -> Optional[str]:
         """Parse the API response based on the HTTP status code"""
@@ -78,17 +139,6 @@ class GCoreAPIClient:
     def _handle_failed_response(self, info: dict) -> None:
         """Handle a failed API request by reporting an error"""
         error_message = f"Failed to request API {info.get('url')}"
-        self.module.fail_json(msg=error_message, request_info=info)
-
-    def _request(self, method: str, url: str, data: Optional[Any] = None, **kwargs) -> Optional[str]:
-        if data:
-            data = self.module.jsonify(data)
-        response, info = fetch_url(
-            module=self.module,
-            url=self._build_url(url, **kwargs),
-            method=method,
-            headers=self._get_headers(),
-            data=data,
-            timeout=self.api_timeout,
-        )
-        return self._parse_response(response, info)
+        body = json.loads(info.get("body", "{}"))
+        message_error = body.get("message", "")
+        self.module.fail_json(msg=error_message, message_error=message_error)

@@ -1,0 +1,48 @@
+---
+- block:
+    - name: Missing requied arguments
+      gcore.cloud.volume:
+        api_key: "{{ API_KEY }}"
+        api_host: "{{ API_HOST }}"
+        project_id: "{{ PROJECT_ID }}"
+        region_id: "{{ REGION_ID }}"
+        command: create
+      register: result
+      ignore_errors: True
+    - name: Verify missing requied arguments
+      assert:
+        that:
+          - result is failed
+          - result.msg == "missing required arguments: name, size, source"
+    
+    - name: Unknown source
+      gcore.cloud.volume:
+        api_key: "{{ API_KEY }}"
+        api_host: "{{ API_HOST }}"
+        project_id: "{{ PROJECT_ID }}"
+        region_id: "{{ REGION_ID }}"
+        command: create
+        source: WOW
+      register: result
+      ignore_errors: True
+    - name: Verify unknown source
+      assert:
+        that:
+          - result is failed
+    
+    - name: Unkown volume type
+      gcore.cloud.volume:
+        api_key: "{{ API_KEY }}"
+        api_host: "{{ API_HOST }}"
+        project_id: "{{ PROJECT_ID }}"
+        region_id: "{{ REGION_ID }}"
+        command: create
+        source: new-volume
+        name: test_ansible_volume
+        type_name: impressive-volume-type
+      register: result
+      ignore_errors: True
+    - name: Verify unkown volume type
+      assert:
+        that:
+          - result is failed

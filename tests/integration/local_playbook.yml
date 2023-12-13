@@ -9,19 +9,17 @@
   tasks:
     - name: Preconditions
       import_tasks: ./targets/common_checks.yml
-    - name: Run image info tasks
-      import_tasks: ./targets/image_info/tasks/main.yml
-    # - name: Run volume tasks
-    #   import_tasks: ./targets/volume/tasks/main.yml
-    # - name: Run instance info tasks
-    #   import_tasks: ./targets/instance_info/tasks/main.yml
-    # - name: Run instance tasks
-    #   import_tasks: ./targets/instance/tasks/main.yml
-    # - name: Run network info tasks
-    #   import_tasks: ./targets/network_info/tasks/main.yml
-    # - name: Run network tasks
-    #   import_tasks: ./targets/network/tasks/main.yml
-    # - name: Run snapshot info tasks
-    #   import_tasks: ./targets/snapshot_info/tasks/main.yml
-    # - name: Run snapshot tasks
-    #   import_tasks: ./targets/snapshot/tasks/main.yml
+    - name: Run image tasks
+      import_tasks: ./targets/image/tasks/main.yml
+    - name: Run volume tasks
+      import_tasks: ./targets/volume/tasks/main.yml
+    - name: Run instance tasks
+      import_tasks: ./targets/instance/tasks/main.yml
+    - name: Run network tasks
+      import_tasks: ./targets/network/tasks/main.yml
+    - name: Run snapshot tasks
+      import_tasks: ./targets/volume_snapshot/tasks/main.yml
+    - name: Run router tasks
+      import_tasks: ./targets/router/tasks/main.yml
+    - name: Run subnet tasks
+      import_tasks: ./targets/subnet/tasks/main.yml

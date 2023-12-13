@@ -1,0 +1,103 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+    volume_source: "new-volume"
+    volume_type_name: "standard"
+    new_volume_type_name: "ssd_hiiops"
+    volume_name: "test_ansible_volume_integration"
+    updated_volume_name: "test_ansible_updated_volume_name"
+
+  block:
+    - name: Create new volume
+      gcore.cloud.volume:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        source: "{{ volume_source }}"
+        name: "{{ volume_name }}"
+        type_name: "{{ volume_type_name }}"
+        metadata: {'ansible_key': 'ansible_value'}
+        size: 1
+      register: created_volume
+    - name: Verify volume
+      ansible.builtin.assert:
+        that:
+          - created_volume.data.name == "{{ volume_name }}"
+          - created_volume.data.size == 1
+          - created_volume.data.volume_type == "{{ volume_type_name }}"
+          - created_volume.data.metadata.ansible_key == "ansible_value"
+
+    - name: Get volume by ID
+      gcore.cloud.volume_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        volume_id: "{{ created_volume.data.id }}"
+      register: volume
+
+    - name: Update existing volume's name
+      gcore.cloud.volume:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        volume_id: "{{ volume.data.id }}"
+        name: "{{ updated_volume_name }}"
+      register: updated_volume
+    - name: Verify volume's rename
+      ansible.builtin.assert:
+        that:
+          - updated_volume.data.name == "{{ updated_volume_name }}"
+
+    - name: Extend existing volume
+      gcore.cloud.volume:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: extend
+        volume_id: "{{ updated_volume.data.id }}"
+        size: 2
+      register: extended_volume
+    - name: Verify volume exted
+      ansible.builtin.assert:
+        that:
+          - extended_volume.data.size == 2
+    
+    - name: Retype existing volume
+      gcore.cloud.volume:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: retype
+        volume_id: "{{ extended_volume.data.id }}"
+        volume_type: "{{ new_volume_type_name }}"
+    
+    - name: Wait for retyping
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Get volume by ID after retyping
+      gcore.cloud.volume_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        volume_id: "{{ extended_volume.data.id }}"
+      register: retyped_volume
+    - name: Verify volume's new type
+      ansible.builtin.assert:
+        that:
+          - retyped_volume.data.volume_type == "{{ new_volume_type_name }}"
+
+  always:
+    - name: Cleanup volumes
+      import_tasks: ./targets/common/tasks/cleanup_volumes.yml
