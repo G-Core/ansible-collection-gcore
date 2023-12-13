@@ -8,69 +8,80 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-module: snapshot_info
+module: volume_snapshot
 author:
     - GCore (@GCore)
-short_description: Gather infos about all GCore snapshots.
+short_description: Manages snapshots
 description:
-    - Gather infos about all GCore snapshots.
+    - Create or delete snapshot for volume
 
 options:
+    command:
+        description:
+            - Operation to perform.
+        choices: [create, delete]
+        required: true
+        type: str
     snapshot_id:
         description:
-            - The ID of the snapshot you want to get.
-            - The module will fail if the provided ID is invalid.
+            - Snapshot ID.
+            - Required if I(command) is delete
         type: str
         required: false
     volume_id:
         description:
-            - Can be used to list snapshots of a single volume
+            - Volume ID to make snapshot of.
+            - Required if I(command) is create
         type: str
         required: false
-    instance_id:
+    name:
         description:
-            - Can be used to list snapshots of any volume in a specific server instance
+            - Snapshot name.
+            - Required if I(command) is create.
         type: str
         required: false
-    schedule_id:
+    description:
         description:
-            - Can be used to list snapshots by schedule id
+            - Snapshot description.
+            - Used if I(command) is create.
         type: str
         required: false
-    lifecycle_policy_id:
+    metadata:
         description:
-            - Can be used to list snapshots by lifecycle policy id
-        type: str
-        required: false
-    limit:
-        description:
-            - Limit the number of returned snapshots
-        type: int
-        required: false
-    offset:
-        description:
-            - Offset value is used to exclude the first set of records from the result
-        type: int
+            - Snapshot metadata.
+            - Used if I(command) is create.
+        type: dict
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
-- name: Gather gcore snapshot infos
-  gcore.cloud.snapshot_info:
+- name: Create new snapshot
+  gcore.cloud.volume_snapshot:
     api_key: "{{ api_key }}"
-
-- name: Gather gcore snapshots info for specific volume
-  gcore.cloud.snapshot_info:
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: create
     volume_id: "{{ volume_id }}"
+    name: "test-snap"
+    description: "after boot"
+
+- name: Delete snapshot
+  gcore.cloud.volume_snapshot:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: delete
+    snapshot_id: "{{ snapshot_id }}"
 """
 
 RETURN = """
-snapshot_info:
+volume_snapshot:
     description:
-        - List of dictionaries.
+        - Response depends of I(command).
+        - If I(command) is create then response will be a dict of resource.
+        - If I(command) is delete then response will be a dict of resource ID.
     returned: always
     type: complex
     contains:
@@ -98,7 +109,7 @@ snapshot_info:
             description: Snapshot name
             returned: always
             type: str
-            sample: '123'
+            sample: test
         description:
             description: Snapshot description
             returned: if available
@@ -149,21 +160,28 @@ snapshot_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.snapshot import (
+    SnapshotManageAction,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
-    snapshot_id = module.params.pop("snapshot_id", None)
-    if snapshot_id:
-        result = api.snapshots.get_by_id(snapshot_id)
-    else:
-        result = api.snapshots.get_list(**module.params)
-    module.exit_json(changed=False, data=result)
+    api = AnsibleCloudClient(module)
+    command = module.params.pop("command")
+    result = api.snapshots.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
     module_spec = dict(
+        command=dict(
+            type="str",
+            choices=list(SnapshotManageAction),
+            required=True,
+        ),
         snapshot_id=dict(
             type="str",
             required=False,
@@ -172,30 +190,33 @@ def main():
             type="str",
             required=False,
         ),
-        instance_id=dict(
+        name=dict(
             type="str",
             required=False,
         ),
-        schedule_id=dict(
+        description=dict(
             type="str",
             required=False,
         ),
-        lifecycle_policy_id=dict(
-            type="str",
-            required=False,
-        ),
-        limit=dict(
-            type="int",
-            required=False,
-        ),
-        offset=dict(
-            type="int",
+        metadata=dict(
+            type="dict",
             required=False,
         ),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

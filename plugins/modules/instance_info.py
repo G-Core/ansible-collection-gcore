@@ -27,7 +27,7 @@ options:
             - Filter out instances by name.
         type: str
         required: false
-    flavor:
+    flavor_id:
         description:
             - Filter out instances by flavor_id. Flavor id must match exactly.
         type: str
@@ -68,11 +68,6 @@ options:
             - Include baremetal instances.
         type: bool
         required: false
-    include_all_bm_ips:
-        description:
-            - Include all ips in baremetal instances.
-        type: bool
-        required: false
     include_k8s:
         description:
             - Include k8s instances.
@@ -106,45 +101,38 @@ options:
             - Filter by metadata values. Must be a valid JSON string.
         type: str
         required: false
-    with_ddos:
-        description:
-            - DDoS profile information will be included if parameter is provided.
-        type: bool
-        required: false
     order_by:
         description:
             - Ordering the server list result by name or created date fields of the server.
         type: str
         required: false
-    type_ddos_profile:
+    limit:
         description:
-            - Return baremetals either only with advanced or only basic DDoS protection.
-        choices: [advanced, basic]
-        type: str
+            - Limit the number of returned instances
+        type: int
         required: false
-    profile_name:
+    offset:
         description:
-            - Filter baremetals by profile name.
-        type: str
-        required: false
-    only_with_fixed_external_ip:
-        description:
-            - Will be returned only BM instance with fixed external IPs.
-        type: bool
+            - Offset value is used to exclude the first set of records from the result
+        type: int
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
-- name: Gather gcore instances infos
+- name: Gather gcore instances info
   gcore.cloud.instance_info:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
 
 - name: Gather gcore specific instance info
   gcore.cloud.gcore_instance_info:
-    instance_id: "{{ instance_id }}"
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    instance_id: "{{ instance_id }}"
 """
 
 RETURN = """
@@ -175,11 +163,6 @@ instance_info:
             returned: always
             type: str
             sample: a7e7e8d6-0bf7-4ac9-8170-831b47ee2ba9
-        flavor_id:
-            description: Flavor ID
-            returned: always
-            type: str
-            sample: g1s-shared-1-0.5
         flavor:
             description: Flavor
             returned: always
@@ -220,7 +203,7 @@ instance_info:
             sample: Testing
         instance_description:
             description: Instance description
-            returned: if available
+            returned: always
             type: str
             sample: Testing
         instance_created:
@@ -240,7 +223,7 @@ instance_info:
             sample: active
         task_state:
             description: Task state
-            returned: if available
+            returned: always
             type: str
             sample: None
         volumes:
@@ -291,7 +274,7 @@ instance_info:
             sample: d1e1500b-e2be-40aa-9a4b-cc493fa1af30
         task_id:
             description: Active task. If None, action has been performed immediately in the request itself
-            returned: if available
+            returned: always
             type: str
             sample: f28a4982-9be1-4e50-84e7-6d1a6d3f8a02
         keypair_name:
@@ -318,24 +301,24 @@ instance_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
-    instance_id = module.params.pop("instance_id", None)
-    if instance_id:
-        result = api.instances.get_by_id(instance_id)
-    else:
-        result = api.instances.get_list(**module.params)
-    module.exit_json(changed=False, data=result)
+    api = AnsibleCloudClient(module)
+    instance_id = module.params.get("instance_id")
+    command = "get_by_id" if instance_id else "get_list"
+    result = api.instances.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
     module_spec = dict(
         instance_id=dict(type="str", required=False),
         name=dict(type="str", required=False),
-        flavor=dict(type="str", required=False),
+        flavor_id=dict(type="str", required=False),
         flavor_prefix=dict(type="str", required=False),
         status=dict(type="str", choices=["ACTIVE", "ERROR", "SHUTOFF", "REBOOT", "PAUSED"], required=False),
         changes_since=dict(type="str", required=False),
@@ -343,22 +326,30 @@ def main():
         exclude_secgroup=dict(type="str", required=False),
         available_floating=dict(type="str", required=False),
         include_baremetal=dict(type="bool", required=False),
-        include_all_bm_ips=dict(type="bool", required=False),
         include_k8s=dict(type="bool", default=True, required=False),
         include_ai=dict(type="bool", default=False, required=False),
         ip=dict(type="str", required=False),
         uuid=dict(type="str", required=False),
         metadata_kv=dict(type="str", required=False),
         metadata_v=dict(type="str", required=False),
-        with_ddos=dict(type="bool", required=False),
         order_by=dict(type="str", required=False),
-        type_ddos_profile=dict(type="str", choices=["advanced", "basic"], required=False),
-        profile_name=dict(type="str", required=False),
-        only_with_fixed_external_ip=dict(type="bool", required=False),
+        limit=dict(type="int", required=False),
+        offset=dict(type="int", required=False),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

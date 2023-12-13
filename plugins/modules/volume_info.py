@@ -57,6 +57,11 @@ options:
             - Filter out volumes by name_part inclusion in volume name
         type: str
         required: false
+    bootable:
+        description:
+            - Filter by a bootable field
+        type: bool
+        required: false
     metadata_k:
         description:
             - Filter by metadata keys. Must be a valid JSON string
@@ -68,18 +73,22 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
-- name: Gather gcore volume infos
+- name: Gather gcore volumes info
   gcore.cloud.volume_info:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
 
 - name: Gather gcore specific volume info
   gcore.cloud.volume_info:
-    volume_id: "{{ volume_id }}"
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    volume_id: "{{ volume_id }}"
 """
 
 RETURN = """
@@ -145,11 +154,6 @@ volume_info:
             returned: if available
             type: str
             sample: test
-        instance_id:
-            description: Instance ID
-            returned: if available
-            type: str
-            sample: b10dd116-07f5-4225-abb7-f42da5cb78fb
         bootable:
             description: Bootable boolean flag
             returned: if available
@@ -231,17 +235,17 @@ volume_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
-    volume_id = module.params.pop("volume_id", None)
-    if volume_id:
-        result = api.volumes.get_by_id(volume_id)
-    else:
-        result = api.volumes.get_list(**module.params)
-    module.exit_json(changed=False, data=result)
+    api = AnsibleCloudClient(module)
+    volume_id = module.params.get("volume_id")
+    command = "get_by_id" if volume_id else "get_list"
+    result = api.volumes.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
@@ -254,12 +258,24 @@ def main():
         has_attachments=dict(type="bool", required=False),
         id_part=dict(type="str", required=False),
         name_part=dict(type="str", required=False),
+        bootable=dict(type="bool", required=False),
         metadata_k=dict(type="str", required=False),
         metadata_kv=dict(type="str", required=False),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

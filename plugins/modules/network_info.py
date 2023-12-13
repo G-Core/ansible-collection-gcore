@@ -37,19 +37,33 @@ options:
             - Filter by metadata keys. Must be a valid JSON string.
         type: str
         required: false
+    limit:
+        description:
+            - Limit the number of returned limit request entities.
+        type: int
+        required: false
+    offset:
+        description:
+            - Offset value is used to exclude the first set of records from the result.
+        type: int
+        required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
-- name: Gather gcore network infos
+- name: Gather gcore networks info
   gcore.cloud.network_info:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
 
 - name: Gather gcore specific network info
   gcore.cloud.network_info:
-    network_id: "{{ network_id }}"
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    network_id: "{{ network_id }}"
 """
 
 RETURN = """
@@ -85,6 +99,11 @@ network_info:
             returned: always
             type: str
             sample: 123
+        mtu:
+            description: Maximum transmission unit
+            returned: always
+            type: int
+            sample: 1450
         created_at:
             description: Datetime when the network was created
             returned: always
@@ -93,7 +112,7 @@ network_info:
         updated_at:
             description: Datetime when the network was last updated
             returned: if available
-            type: int
+            type: str
             sample: 2019-06-19T11:56:16+0000
         type:
             description: Network type (vlan, vxlan)
@@ -103,7 +122,7 @@ network_info:
         segmentation_id:
             description: Id of network segment
             returned: if available
-            type: str
+            type: int
             sample: 9
         external:
             description: True if the network has router:external attribute
@@ -112,7 +131,7 @@ network_info:
             sample: true
         default:
             description: True if the network has is_default attribute
-            returned: always
+            returned: if available
             type: bool
             sample: true
         shared:
@@ -146,17 +165,17 @@ network_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
-    network_id = module.params.pop("network_id", None)
-    if network_id:
-        result = api.networks.get_by_id(network_id)
-    else:
-        result = api.networks.get_list(**module.params)
-    module.exit_json(changed=False, data=result)
+    api = AnsibleCloudClient(module)
+    network_id = module.params.get("network_id")
+    command = "get_by_id" if network_id else "get_list"
+    result = api.networks.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
@@ -165,10 +184,23 @@ def main():
         order_by=dict(type="str", required=False),
         metadata_k=dict(type="str", required=False),
         metadata_kv=dict(type="str", required=False),
+        limit=dict(type="int", required=False),
+        offset=dict(type="int", required=False),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

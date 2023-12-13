@@ -24,8 +24,8 @@ options:
         type: str
     network_id:
         description:
-            - The ID of network you want to get.
-            - The module will fail if the provided ID is invalid.
+            - The ID of network
+            - Required if I(command) is update or delete
         type: str
         required: false
     name:
@@ -51,30 +51,45 @@ options:
         description:
             - Network metadata
             - Used if I(command) is create.
-        type: str
+        type: dict
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
-- name: Gather gcore network infos
+- name: Create new network
   gcore.cloud.network:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: create
+    name: "test-network"
 
-- name: Gather gcore specific network info
+- name: Rename network
   gcore.cloud.network:
-    network_id: "{{ network_id }}"
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: update
+    network_id: "{{ network_id }}"
+    name: "new-name"
+
+- name: Delete network
+  gcore.cloud.network:
+    api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: delete
+    network_id: "{{ network_id }}"
 """
 
 RETURN = """
 network:
     description:
         - Response depends of I(command).
-        - If I(command) is one of create or delete then response will be list of tasks.
-        - If I(command) is update then response will be a dict of resource.
-        - Otherwise it is a list of dictionaries.
+        - If I(command) is create or update then response will be a dict of resource.
+        - If I(command) is delete then response will be a dict of resource ID.
     returned: always
     type: complex
     contains:
@@ -103,6 +118,11 @@ network:
             returned: always
             type: str
             sample: 123
+        mtu:
+            description: Maximum transmission unit
+            returned: always
+            type: int
+            sample: 1450
         created_at:
             description: Datetime when the network was created
             returned: always
@@ -111,7 +131,7 @@ network:
         updated_at:
             description: Datetime when the network was last updated
             returned: if available
-            type: int
+            type: str
             sample: 2019-06-19T11:56:16+0000
         type:
             description: Network type (vlan, vxlan)
@@ -121,7 +141,7 @@ network:
         segmentation_id:
             description: Id of network segment
             returned: if available
-            type: str
+            type: int
             sample: 9
         external:
             description: True if the network has router:external attribute
@@ -130,7 +150,7 @@ network:
             sample: true
         default:
             description: True if the network has is_default attribute
-            returned: always
+            returned: if available
             type: bool
             sample: true
         shared:
@@ -165,30 +185,43 @@ from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
-    NetworkAction,
+    NetworkManageAction,
 )
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
+    api = AnsibleCloudClient(module)
     command = module.params.pop("command")
-    result = api.networks.execute_command(command=command, params=module.params)
-    module.exit_json(changed=False, data=result)
+    result = api.networks.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
     module_spec = dict(
-        command=dict(type="str", choices=list(NetworkAction), required=True),
+        command=dict(type="str", choices=list(NetworkManageAction), required=True),
         network_id=dict(type="str", required=False),
         name=dict(type="str", required=False),
         create_router=dict(type="bool", required=False),
         type=dict(type="str", choices=["vlan", "vxlan"], required=False),
-        metadata=dict(type="str", required=False),
+        metadata=dict(type="dict", required=False),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

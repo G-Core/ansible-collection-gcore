@@ -8,14 +8,6 @@
     new_network_name: "test_ansible_network_2"
 
   block:
-    - name: List networks before creation
-      gcore.cloud.network_info:
-        api_key: "{{ api_key }}"
-        api_host: "{{ api_host }}"
-        project_id: "{{ project_id }}"
-        region_id: "{{ region_id }}"
-      register: list_result_before
-
     - name: Create new network
       gcore.cloud.network:
         api_key: "{{ api_key }}"
@@ -24,30 +16,15 @@
         region_id: "{{ region_id }}"
         command: create
         name: "{{ network_name }}"
-      register: create_result
-
-    - name: Verify task
+        metadata: {'ansible_key': 'ansible_value'}
+      register: created_network
+    - name: Verify network
       ansible.builtin.assert:
         that:
-          - create_result.data["tasks"] | list | length == 1
+          - created_network.data.name == "{{ network_name }}"
+          - created_network.data.type == "vxlan"
+          - created_network.data.metadata[0].key == "ansible_key"
 
-    - name: Wait for network
-      ansible.builtin.pause:
-        minutes: 1
-
-    - name: List networks after creation
-      gcore.cloud.network_info:
-        api_key: "{{ api_key }}"
-        api_host: "{{ api_host }}"
-        project_id: "{{ project_id }}"
-        region_id: "{{ region_id }}"
-      register: list_result_after
-
-    - name: Check network list length
-      ansible.builtin.assert:
-        that:
-          - list_result_after.data | length == list_result_before.data | length + 1
-    
     - name: Update existing network's name
       gcore.cloud.network:
         api_key: "{{ api_key }}"
@@ -55,22 +32,13 @@
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
         command: update
-        network_id: "{{ list_result_after.data[0]['id'] }}"
+        network_id: "{{ created_network.data.id }}"
         name: "{{ new_network_name }}"
-    
-    - name: Find network by id
-      gcore.cloud.network_info:
-        api_key: "{{ api_key }}"
-        api_host: "{{ api_host }}"
-        project_id: "{{ project_id }}"
-        region_id: "{{ region_id }}"
-        network_id: "{{ list_result_after.data[0]['id'] }}"
-      register: find_result
-
+      register: updated_network
     - name: Verify name updated
       ansible.builtin.assert:
         that:
-          - find_result.data['name'] == "{{ new_network_name }}"
+          - updated_network.data.name == "{{ new_network_name }}"
 
   always:
     - name: Cleanup newtworks

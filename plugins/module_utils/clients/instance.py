@@ -3,9 +3,18 @@ from enum import Enum
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.base import (
     BaseResourceClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.instance import (
+    CreateInstance,
+    DeleteInstance,
+    GetInstanceList,
+    GetInstanceQuota,
+    InstanceId,
+    StartInstance,
+    UpdateInstance,
+)
 
 
-class InstanceAction(str, Enum):
+class InstanceManageAction(str, Enum):
     CREATE = "create"
     UPDATE = "update"
     DELETE = "delete"
@@ -17,52 +26,105 @@ class InstanceAction(str, Enum):
     RESUME = "resume"
 
 
-class GCoreInstanceClient(BaseResourceClient):
+class InstanceGetAction(str, Enum):
+    GET_LIST = "get_list"
+    GET_BY_ID = "get_by_id"
+    GET_QUOTA = "get_quota"
+
+
+class CloudInstanceClient(BaseResourceClient):
+    RESOURCE = "instance"
+
     ACTION_CONFIG = {
-        InstanceAction.CREATE: {
+        InstanceGetAction.GET_LIST: {
+            "method": "get",
+            "schemas": {
+                "query_params": GetInstanceList,
+            },
+        },
+        InstanceGetAction.GET_BY_ID: {
+            "method": "get",
+            "path": "{instance_id}",
+            "schemas": {
+                "path_params": InstanceId,
+            },
+        },
+        InstanceGetAction.GET_QUOTA: {
+            "method": "post",
+            "url": "v2/instances/",
+            "path": "check_limits",
+            "schemas": {
+                "data": GetInstanceQuota,
+            },
+        },
+        InstanceManageAction.CREATE: {
             "url": "v2/instances/",
             "method": "post",
-            "path": "",
-            "required_params": ["flavor", "interfaces", "volumes"],
+            "as_task": True,
+            "timeout": 3000,
+            "schemas": {
+                "data": CreateInstance,
+            },
         },
-        InstanceAction.UPDATE: {
+        InstanceManageAction.UPDATE: {
             "method": "patch",
             "path": "{instance_id}",
-            "required_params": ["instance_id", "name"],
+            "schemas": {
+                "path_params": InstanceId,
+                "data": UpdateInstance,
+            },
         },
-        InstanceAction.DELETE: {
+        InstanceManageAction.DELETE: {
             "method": "delete",
             "path": "{instance_id}",
-            "required_params": ["instance_id"],
+            "as_task": True,
+            "timeout": 1200,
+            "schemas": {
+                "path_params": InstanceId,
+                "query_params": DeleteInstance,
+            },
         },
-        InstanceAction.START: {
+        InstanceManageAction.START: {
             "method": "post",
             "path": "{instance_id}/start",
-            "required_params": ["instance_id"],
+            "schemas": {
+                "path_params": InstanceId,
+                "data": StartInstance,
+            },
         },
-        InstanceAction.STOP: {
+        InstanceManageAction.STOP: {
             "method": "post",
             "path": "{instance_id}/stop",
-            "required_params": ["instance_id"],
+            "schemas": {
+                "path_params": InstanceId,
+            },
         },
-        InstanceAction.POWERCYCLE: {
+        InstanceManageAction.POWERCYCLE: {
             "method": "post",
             "path": "{instance_id}/powercycle",
-            "required_params": ["instance_id"],
+            "schemas": {
+                "path_params": InstanceId,
+            },
         },
-        InstanceAction.REBOOT: {
+        InstanceManageAction.REBOOT: {
             "method": "post",
             "path": "{instance_id}/reboot",
-            "required_params": ["instance_id"],
+            "schemas": {
+                "path_params": InstanceId,
+            },
         },
-        InstanceAction.SUSPEND: {
+        InstanceManageAction.SUSPEND: {
             "method": "post",
             "path": "{instance_id}/suspend",
-            "required_params": ["instance_id"],
+            "schemas": {
+                "path_params": InstanceId,
+            },
         },
-        InstanceAction.RESUME: {
+        InstanceManageAction.RESUME: {
             "method": "post",
             "path": "{instance_id}/resume",
-            "required_params": ["instance_id"],
+            "schemas": {
+                "path_params": InstanceId,
+            },
         },
     }

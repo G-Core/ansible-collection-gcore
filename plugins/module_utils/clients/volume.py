@@ -9,13 +9,15 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.volume
     CreateVolumeFromSnapshot,
     DeleteVolume,
     ExtendVolume,
+    GetVolumeList,
     RetypeVolume,
     UpdateVolume,
+    VolumeId,
     VolumeInstanceAction,
 )
 
 
-class VolumeAction(str, Enum):
+class VolumeManageAction(str, Enum):
     CREATE = "create"
     UPDATE = "update"
     DELETE = "delete"
@@ -23,36 +25,104 @@ class VolumeAction(str, Enum):
     DETACH = "detach"
     EXTEND = "extend"
     RETYPE = "retype"
+    REVERT = "revert"
 
 
-class GCoreVolumeClient(BaseResourceClient):
+class VolumeGetAction(str, Enum):
+    GET_LIST = "get_list"
+    GET_BY_ID = "get_by_id"
+
+
+class CloudVolumeClient(BaseResourceClient):
+    RESOURCE = "volume"
+
     ACTION_CONFIG = {
-        VolumeAction.CREATE: {
-            "method": "post",
-            "path": "",
-            "schema": {
-                "new-volume": CreateVolume,
-                "image": CreateVolumeFromImage,
-                "snapshot": CreateVolumeFromSnapshot,
+        VolumeGetAction.GET_LIST: {
+            "method": "get",
+            "schemas": {
+                "query_params": GetVolumeList,
             },
         },
-        VolumeAction.UPDATE: {"method": "patch", "path": "{volume_id}", "schema": UpdateVolume},
-        VolumeAction.DELETE: {"method": "delete", "path": "{volume_id}", "schema": DeleteVolume},
-        VolumeAction.ATTACH: {"method": "post", "path": "{volume_id}/attach", "schema": VolumeInstanceAction},
-        VolumeAction.DETACH: {"method": "post", "path": "{volume_id}/detach", "schema": VolumeInstanceAction},
-        VolumeAction.EXTEND: {"method": "post", "path": "{volume_id}/extend", "schema": ExtendVolume},
-        VolumeAction.RETYPE: {"method": "post", "path": "{volume_id}/retype", "schema": RetypeVolume},
+        VolumeGetAction.GET_BY_ID: {
+            "method": "get",
+            "path": "{volume_id}",
+            "schemas": {
+                "path_params": VolumeId,
+            },
+        },
+        VolumeManageAction.CREATE: {
+            "method": "post",
+            "as_task": True,
+            "timeout": 1200,
+            "schemas": {
+                "new-volume": {"data": CreateVolume},
+                "image": {"data": CreateVolumeFromImage},
+                "snapshot": {"data": CreateVolumeFromSnapshot},
+                "default": {"data": CreateVolume},
+            },
+        },
+        VolumeManageAction.UPDATE: {
+            "method": "patch",
+            "path": "{volume_id}",
+            "schemas": {"path_params": VolumeId, "data": UpdateVolume},
+        },
+        VolumeManageAction.DELETE: {
+            "method": "delete",
+            "as_task": True,
+            "timeout": 1200,
+            "path": "{volume_id}",
+            "schemas": {
+                "path_params": VolumeId,
+                "query_params": DeleteVolume,
+            },
+        },
+        VolumeManageAction.ATTACH: {
+            "url": "v2/volumes/",
+            "method": "post",
+            "as_task": True,
+            "timeout": 600,
+            "path": "{volume_id}/attach",
+            "schemas": {
+                "path_params": VolumeId,
+                "data": VolumeInstanceAction,
+            },
+        },
+        VolumeManageAction.DETACH: {
+            "url": "v2/volumes/",
+            "method": "post",
+            "as_task": True,
+            "timeout": 600,
+            "path": "{volume_id}/detach",
+            "schemas": {
+                "path_params": VolumeId,
+                "data": VolumeInstanceAction,
+            },
+        },
+        VolumeManageAction.EXTEND: {
+            "method": "post",
+            "as_task": True,
+            "timeout": 1200,
+            "path": "{volume_id}/extend",
+            "schemas": {
+                "path_params": VolumeId,
+                "data": ExtendVolume,
+            },
+        },
+        VolumeManageAction.RETYPE: {
+            "method": "post",
+            "path": "{volume_id}/retype",
+            "schemas": {
+                "path_params": VolumeId,
+                "data": RetypeVolume,
+            },
+        },
+        VolumeManageAction.REVERT: {
+            "method": "post",
+            "path": "{volume_id}/revert",
+            "as_task": True,
+            "timeout": 1200,
+            "schemas": {
+                "path_params": VolumeId,
+            },
+        },
     }
-
-    def execute_command(self, command: VolumeAction, params: dict):
-        config = self.ACTION_CONFIG[command]
-        schema = (
-            config["schema"] if command != VolumeAction.CREATE.value else config["schema"].get(params.get("source"))
-        )
-        self.module.fail_on_missing_params(required_params=schema.get_required())
-
-        data = schema.init_as_dict(params)
-        volume_id = data.pop("volume_id", None) if command != VolumeAction.CREATE.value else data.get("volume_id")
-        path = config["path"].format(volume_id=volume_id, **data)
-        method = getattr(self.api_client, config["method"])
-        return method(url=self.url, path=path, data=data)

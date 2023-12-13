@@ -13,13 +13,13 @@ author:
     - GCore (@GCore)
 short_description: Manages volumes
 description:
-    - Create/update/delete or attach/detach or resize volume
+    - Create/update/delete or attach/detach or retype/revert or extend volume
 
 options:
     command:
         description:
             - Operation to perform.
-        choices: [create, update, delete, attach, detach, extend, retype]
+        choices: [create, update, delete, attach, detach, extend, retype, revert]
         required: true
         type: str
 
@@ -29,11 +29,17 @@ options:
         type: str
     type_name:
         description:
-            - One of 'standard', 'ssd_hiiops', 'cold', 'ultra'. If not specified for
-            - source 'snapshot', volume type will be derived from the snapshot volume.
+            - One of 'standard', 'ssd_hiiops', 'cold', 'ultra', 'ssd_lowlatency'.
+            - If not specified for - source 'snapshot', volume type will be derived from the snapshot volume.
             - Otherwise defaults to standard.
             - Required if I(command) is create
-        choices: [standard, ssd_hiiops, cold, ultra]
+        choices: [standard, ssd_hiiops, cold, ultra, ssd_local, ssd_lowlatency]
+        type: str
+    volume_type:
+        description:
+            - Volume type. Must be one of standard or ssd_hiiops
+            - Required if I(command) is retype
+        choices: [standard, ssd_hiiops]
         type: str
     name:
         description:
@@ -55,7 +61,8 @@ options:
         description:
             - Lifecycle policy ID list
             - Used if I(command) is create
-        type: str
+        type: list
+        elements: int
     metadata:
         description:
             - Create one or more metadata items for a volume
@@ -82,14 +89,26 @@ options:
             - Snapshot ID
             - Required if I(command) is create
         type: str
+    instance_id:
+        description:
+            - Instance ID attach to
+            - Required if I(command) is attach
+        type: str
+    snapshots:
+        description:
+            - Comma separated list of snapshot IDs to be deleted with the volume
+            - Used if I(command) is delete
+        type: str
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
 - name: Create a new empty volume
   gcore.cloud.volume:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
     command: create
     source: new-volume
     type_name: standard
@@ -99,15 +118,32 @@ EXAMPLES = """
 - name: Create a new volume from image
   gcore.cloud.volume:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
     command: create
     source: image
     type_name: standard
     image_id: "{{ image_id }}"
+    name: test-volume
+    size: 5
+
+- name: Create a new volume from snapshot
+  gcore.cloud.volume:
+    api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: create
+    source: snapshot
+    type_name: standard
+    snapshot_id: "{{ snapshot_id }}"
+    name: test-volume
     size: 5
 
 - name: Extend existing volume
   gcore.cloud.volume:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
     command: extend
     volume_id: "{{ volume_id }}"
     size: 20
@@ -115,6 +151,8 @@ EXAMPLES = """
 - name: Attach existing volume to instance
   gcore.cloud.volume:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
     command: attach
     volume_id: "{{ volume_id }}"
     instance_id: "{{ instance_id }}"
@@ -122,30 +160,52 @@ EXAMPLES = """
 - name: Detach existing volume from instance
   gcore.cloud.volume:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
     command: detach
     volume_id: "{{ volume_id }}"
     instance_id: "{{ instance_id }}"
 
-- name: Delete existing volume
-  gcore.cloud.volume:
-    api_key: "{{ api_key }}"
-    command: delete
-    volume_id: "{{ volume_id }}"
-
 - name: Update existing volume's name
   gcore.cloud.volume:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
     command: update
     volume_id: "{{ volume_id }}"
     name: new-volume-name
+
+- name: Retype existing volume
+  gcore.cloud.volume:
+    api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: retype
+    volume_id: "{{ volume_id }}"
+    volume_type: "{{ volume_type }}"
+
+- name: Revert existing volume
+  gcore.cloud.volume:
+    api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: revert
+    volume_id: "{{ volume_id }}"
+
+- name: Delete existing volume
+  gcore.cloud.volume:
+    api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    command: delete
+    volume_id: "{{ volume_id }}"
 """
 
 RETURN = """
 volume:
     description:
         - Response depends of I(command).
-        - If I(command) is one of create or delete then response will be list of tasks.
-        - If I(command) is one of update, attach, detach or retype then response will be a dict of resource.
+        - Resource dictionary.
     returned: always
     type: complex
     contains:
@@ -204,11 +264,6 @@ volume:
             returned: if available
             type: str
             sample: test
-        instance_id:
-            description: Instance ID
-            returned: if available
-            type: str
-            sample: b10dd116-07f5-4225-abb7-f42da5cb78fb
         bootable:
             description: Bootable boolean flag
             returned: if available
@@ -291,27 +346,30 @@ from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.volume import (
+    RetypableVolumeType,
     VolumeSource,
     VolumeType,
 )
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.volume import (
-    VolumeAction,
+    VolumeManageAction,
 )
-from ansible_collections.gcore.cloud.plugins.module_utils.gcore import AnsibleGCore
+from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
+    AnsibleCloudClient,
+)
 
 
 def manage(module: AnsibleModule):
-    api = AnsibleGCore(module)
+    api = AnsibleCloudClient(module)
     command = module.params.pop("command")
-    result = api.volumes.execute_command(command=command, params=module.params)
-    module.exit_json(changed=True, data=result)
+    result = api.volumes.execute_command(command=command)
+    module.exit_json(**result)
 
 
 def main():
     module_spec = dict(
         command=dict(
             type="str",
-            choices=list(VolumeAction),
+            choices=list(VolumeManageAction),
             required=True,
         ),
         volume_id=dict(
@@ -321,6 +379,11 @@ def main():
         type_name=dict(
             type="str",
             choices=list(VolumeType),
+            required=False,
+        ),
+        volume_type=dict(
+            type="str",
+            choices=list(RetypableVolumeType),
             required=False,
         ),
         name=dict(
@@ -335,7 +398,8 @@ def main():
             required=False,
         ),
         lifecycle_policy_ids=dict(
-            type="str",
+            type="list",
+            elements="int",
             required=False,
         ),
         metadata=dict(
@@ -358,10 +422,27 @@ def main():
         snapshot_id=dict(
             type="str",
         ),
+        instance_id=dict(
+            type="str",
+        ),
+        snapshots=dict(
+            type="str",
+        ),
     )
-    spec = AnsibleGCore.get_api_spec()
+    spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True,
+    )
     try:
         manage(module)
     except Exception as exc:

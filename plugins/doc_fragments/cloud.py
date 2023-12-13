@@ -19,13 +19,23 @@ options:
     project_id:
         description:
             - GCore API project ID
+            - Required if I(project_name) is not passed
         type: int
-        required: true
+    project_name:
+        description:
+            - GCore API project name
+            - Required if I(project_id) is not passed
+        type: str
     region_id:
         description:
             - GCore API region ID
+            - Required if I(region_name) is not passed
         type: int
-        required: true
+    region_name:
+        description:
+            - GCore API region name
+            - Required if I(region_id) is not passed
+        type: str
 seealso:
 - name: Documentation for GCore Cloud API
   description: Complete public API documentation.
