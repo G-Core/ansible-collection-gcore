@@ -61,13 +61,13 @@ class AnsibleCloudClient:
         return dict(
             api_key=dict(
                 type="str",
-                fallback=(env_fallback, ["API_KEY"]),
+                fallback=(env_fallback, ["CLOUD_API_KEY"]),
                 no_log=True,
                 required=True,
             ),
             api_host=dict(
                 type="str",
-                fallback=(env_fallback, ["API_HOST"]),
+                fallback=(env_fallback, ["CLOUD_API_HOST"]),
                 default="https://api.gcore.com/cloud",
             ),
             api_timeout=dict(
@@ -77,18 +77,18 @@ class AnsibleCloudClient:
             ),
             project_id=dict(
                 type="int",
-                fallback=(env_fallback, ["PROJECT_ID"]),
+                fallback=(env_fallback, ["CLOUD_PROJECT_ID"]),
             ),
             project_name=dict(
                 type="str",
-                fallback=(env_fallback, ["PROJECT_NAME"]),
+                fallback=(env_fallback, ["CLOUD_PROJECT_NAME"]),
             ),
             region_id=dict(
                 type="int",
-                fallback=(env_fallback, ["REGION_ID"]),
+                fallback=(env_fallback, ["CLOUD_REGION_ID"]),
             ),
             region_name=dict(
                 type="str",
-                fallback=(env_fallback, ["REGION_NAME"]),
+                fallback=(env_fallback, ["CLOUD_REGION_NAME"]),
             ),
         )
