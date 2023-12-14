@@ -63,7 +63,6 @@ class AnsibleCloudClient:
                 type="str",
                 fallback=(env_fallback, ["CLOUD_API_KEY"]),
                 no_log=True,
-                required=True,
             ),
             api_host=dict(
                 type="str",
