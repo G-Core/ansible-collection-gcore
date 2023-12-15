@@ -39,7 +39,7 @@ options:
         description:
             - GCore API region name
             - Required if I(region_id) is not passed
-            - Can be passed as I(CLOUD_PROJECT_NAME) environment variable.
+            - Can be passed as I(CLOUD_REGION_NAME) environment variable.
         type: str
 seealso:
 - name: Documentation for GCore Cloud API
