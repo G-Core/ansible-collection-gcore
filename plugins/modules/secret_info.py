@@ -71,7 +71,7 @@ secret_info:
             sample: '2023-03-23T20:00:00+00:00'
         expiration:
             description: Datetime when the secret will expire
-            returned: if available
+            returned: always
             type: str
             sample: '2023-06-23T20:00:00+00:00'
         mode:

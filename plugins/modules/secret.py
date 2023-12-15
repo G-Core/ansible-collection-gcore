@@ -28,70 +28,25 @@ options:
             - Required if I(command) is delete
         required: false
         type: str
-    algorithm:
-        description:
-            - Metadata provided by a user or system for informational purposes.
-            - Used if I(command) is create
-        required: false
-        type: str
-    bit_length:
-        description:
-            - Metadata provided by a user or system for informational purposes.
-            - Used if I(command) is create
-        required: false
-        type: int
-    expiration:
-        description:
-            - Datetime when the secret will expire.
-            - Used if I(command) is create
-        required: false
-        type: str
-    mode:
-        description:
-            - Metadata provided by a user or system for informational purposes.
-            - Used if I(command) is create
-        required: false
-        type: str
     name:
         description:
             - Secret name
             - Required if I(command) is create
         required: false
         type: str
+    expiration:
+        description:
+            - Datetime when the secret will expire.
+            - Used if I(command) is create
+        required: false
+        type: str
     payload:
         description:
-            - For HTTPS-terminated load balancing, provide base64 encoded conents of a PKCS12 file.
-            - The PKCS12 file is the combined TLS certificate, key, and intermediate certificate chain obtained from
-            - an external certificate authority. The file can be created via openssl, e.g.
+            - Secret payload.
+            - Contains certificate, private_key and certificate_chain fields
             - Required if I(command) is create
         required: false
-        type: str
-    payload_content_encoding:
-        description:
-            - The encoding used for the payload to be able to include it in the JSON request.
-            - Required if I(command) is create
-        required: false
-        type: str
-    payload_content_type:
-        description:
-            - The media type for the content of the payload.
-            - Required if I(command) is create
-        required: false
-        type: str
-    secret_type:
-        description:
-            - Secret type.
-            - Required if I(command) is create
-        choices: [
-            symmetric,
-            public,
-            private,
-            passphrase,
-            certificate,
-            opaque
-        ]
-        required: false
-        type: str
+        type: dict
 extends_documentation_fragment:
     - gcore.cloud.cloud.documentation
 """
@@ -105,10 +60,11 @@ EXAMPLES = """
     command: create
     expiration: "2025-12-28T19:14:44.180394"
     name: "AES key"
-    payload: "aGVsbG8sIHRlc3Qgc3RyaW5nCg=="
-    payload_content_encoding: "base64"
-    payload_content_type: "application/octet-stream"
-    secret_type: "certificate"
+    payload: {
+        'certificate': '<certificate>',
+        'private_key': '<private_key>',
+        'certificate_chain': '<certificate_chain>'
+    }
 
 - name: Delete secret
   gcore.cloud.secret:
@@ -149,7 +105,7 @@ secret:
             sample: '2023-03-23T20:00:00+00:00'
         expiration:
             description: Datetime when the secret will expire
-            returned: if available
+            returned: always
             type: str
             sample: '2023-06-23T20:00:00+00:00'
         mode:
@@ -182,9 +138,6 @@ secret:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
-from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.secret import (
-    SecretType,
-)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.secret import (
     SecretManageAction,
 )
@@ -204,15 +157,9 @@ def main():
     module_spec = dict(
         command=dict(type="str", choices=list(SecretManageAction), required=True),
         secret_id=dict(type="str", required=False),
-        algorithm=dict(type="str", required=False),
-        bit_length=dict(type="int", required=False),
         expiration=dict(type="str", required=False),
-        mode=dict(type="str", required=False),
         name=dict(type="str", required=False),
-        payload=dict(type="str", required=False),
-        payload_content_encoding=dict(type="str", required=False),
-        payload_content_type=dict(type="str", required=False),
-        secret_type=dict(type="str", choices=list(SecretType), required=False),
+        payload=dict(type="dict", required=False),
     )
     spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)

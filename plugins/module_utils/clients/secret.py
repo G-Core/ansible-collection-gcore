@@ -35,6 +35,7 @@ class CloudSecretClient(BaseResourceClient):
         },
         SecretManageAction.CREATE: {
             "method": "post",
+            "url": "v2/secrets/",
             "as_task": True,
             "timeout": 1000,
             "schemas": {
