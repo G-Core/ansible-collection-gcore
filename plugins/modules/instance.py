@@ -13,13 +13,13 @@ author:
     - GCore (@GCore)
 short_description: Manages instances.
 description:
-    - Create, update, delete, start, stop, powercycle, reboot, suspend or resume instance.
+    - Create, update, delete, start, stop, powercycle, reboot, suspend, resume, add_to_servergroup or remove_from_servergroup.
 
 options:
     command:
         description:
             - Operation to perform.
-        choices: [create, update, delete, start, stop, powercycle, reboot, suspend, resume]
+        choices: [create, update, delete, start, stop, powercycle, reboot, suspend, resume, add_to_servergroup, remove_from_servergroup]
         required: true
         type: str
     instance_id:
@@ -128,7 +128,7 @@ options:
     servergroup_id:
         description:
             - Anti-affinity or affinity or soft-anti-affinity server group ID.
-            - Optional if I(command) is create.
+            - Optional if I(command) is create or add_to_servergroup.
         type: str
         required: false
     floatings:
@@ -387,7 +387,7 @@ instance_info:
             }
         security_groups:
             description: Security groups
-            returned: if available
+            returned: always
             type: list
             sample: [{'name': 'default'}]
         creator_task_id:
@@ -402,7 +402,7 @@ instance_info:
             sample: f28a4982-9be1-4e50-84e7-6d1a6d3f8a02
         keypair_name:
             description: Keypair name
-            returned: if available
+            returned: always
             type: str
             sample: None
         blackhole_ports:

@@ -76,3 +76,8 @@ class GetInstanceQuota(BaseSchema):
     names: Optional[List[str]] = None
     name_templates: Optional[List[str]] = None
     interfaces: Optional[List[dict]] = None
+
+
+@dataclass
+class AddToServergroup(BaseSchema):
+    servergroup_id: str

@@ -4,6 +4,7 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.base import (
     BaseResourceClient,
 )
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.schemas.instance import (
+    AddToServergroup,
     CreateInstance,
     DeleteInstance,
     GetInstanceList,
@@ -24,6 +25,8 @@ class InstanceManageAction(str, Enum):
     REBOOT = "reboot"
     SUSPEND = "suspend"
     RESUME = "resume"
+    ADD_TO_SERVERGROUP = "add_to_servergroup"
+    REMOVE_FROM_SERVERGROUP = "remove_from_servergroup"
 
 
 class InstanceGetAction(str, Enum):
@@ -123,6 +126,21 @@ class CloudInstanceClient(BaseResourceClient):
         InstanceManageAction.RESUME: {
             "method": "post",
             "path": "{instance_id}/resume",
+            "schemas": {
+                "path_params": InstanceId,
+            },
+        },
+        InstanceManageAction.ADD_TO_SERVERGROUP: {
+            "method": "post",
+            "path": "{instance_id}/put_into_servergroup",
+            "schemas": {
+                "path_params": InstanceId,
+                "data": AddToServergroup,
+            },
+        },
+        InstanceManageAction.REMOVE_FROM_SERVERGROUP: {
+            "method": "post",
+            "path": "{instance_id}/remove_from_servergroup",
             "schemas": {
                 "path_params": InstanceId,
             },
