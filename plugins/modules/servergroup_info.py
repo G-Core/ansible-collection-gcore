@@ -30,11 +30,15 @@ EXAMPLES = """
 - name: Gather gcore servergroups infos
   gcore.cloud.servergroup_info:
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
 
 - name: Gather gcore specific servergroup info
   gcore.cloud.servergroup_info:
-    servergroup_id: "{{ servergroup_id }}"
     api_key: "{{ api_key }}"
+    region_id: "{{ region_id }}"
+    project_id: "{{ project_id }}"
+    servergroup_id: "{{ servergroup_id }}"
 """
 
 RETURN = """
@@ -66,7 +70,7 @@ servergroup_info:
             sample: 47003067-550a-6f17-93b6-81ee16ba061e
         policy:
             description: anti-affinity or affinity or soft-anti-affinity
-            returned: if available
+            returned: always
             type: str
             sample: anti-affinity
         name:
@@ -76,7 +80,7 @@ servergroup_info:
             sample: example_server_group
         instances:
             description: Instances in this server group
-            returned: if available
+            returned: always
             type: list
             elements: dict
             sample: [{'instance_id': '6d14f194-6c1e-49b3-9fc7-50dc8401eb74', 'instance_name': 'test_ruslan_aa2'}]
