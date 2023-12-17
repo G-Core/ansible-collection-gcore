@@ -12,8 +12,7 @@ class CloudAPIClient:
         self.api_key = module.params["api_key"]
         self.api_timeout = module.params["api_timeout"]
         self.api_host = self._set_api_host()
-        self.project_id = self._set_project_id()
-        self.region_id = self._set_region_id()
+        self._set_project_and_region()
 
     def get(
         self,
@@ -44,15 +43,13 @@ class CloudAPIClient:
         data: Optional[dict] = None,
         **kwargs,
     ):
-        url = f"{self.api_host}{url}"
-        if kwargs.get("include_project_region", True):
-            url += f"{self.project_id}/{self.region_id}"
-        data = self.module.jsonify(data) if data else None
-        if path_params:
-            url = urljoin(url + "/", path_params)
-        if query_params:
-            query_str = urlencode(query_params)
-            url = f"{url}?{query_str}"
+        url = self._construct_url(
+            url,
+            path_params,
+            query_params,
+            include_project_region=kwargs.get("include_project_region", True),
+        )
+        data = self._prepare_data(data)
         response, info = fetch_url(
             module=self.module,
             url=url,
@@ -63,43 +60,46 @@ class CloudAPIClient:
         )
         return self._parse_response(response, info)
 
-    def _set_project_id(self):
-        project_id = self.module.params.get("project_id")
-        if project_id:
-            return project_id
-        project_name = self.module.params["project_name"]
-        response, info = fetch_url(
-            self.module, url=f"{self.api_host}v1/projects", method="GET", headers=self._get_headers()
-        )
-        for project in self._parse_response(response, info):
-            if project["name"] == project_name:
-                return project["id"]
-            self.module.fail_json(f"Project {project_name} not found")
+    def _construct_url(
+        self,
+        url: str,
+        path_params: Optional[str] = None,
+        query_params: Optional[dict] = None,
+        include_project_region: bool = True,
+    ) -> str:
+        url = f"{self.api_host}{url}"
+        if include_project_region:
+            url += f"{self.project_id}/{self.region_id}"
+        if query_params:
+            query_str = urlencode(query_params)
+            url = f"{url}?{query_str}"
+        if path_params:
+            url = urljoin(url + "/", path_params)
+        return url
 
-    def _set_region_id(self):
-        region_id = self.module.params.get("region_id")
-        if region_id:
-            return region_id
-        region_name = self.module.params["region_name"]
-        response, info = fetch_url(
-            self.module, url=f"{self.api_host}v1/regions", method="GET", headers=self._get_headers()
-        )
-        for project in self._parse_response(response, info):
-            if project["display_name"] == region_name:
-                return project["id"]
-        self.module.fail_json(f"Region {region_name} not found")
+    def _prepare_data(self, data: Optional[dict]) -> Optional[str]:
+        return self.module.jsonify(data) if data else None
 
     def _set_project_and_region(self):
-        params = [("project", "name"), ("region", "disply_name")]
-        for param in params:
-            type_, name_ = param
-            if not self.module.params.get(f"{type_}_id"):
-                name = self.module.params.get(f"{type_}_name")
-                response = self.get(url=f"v1/{type_}s", build_url=False)
-                for item in response:
-                    if item[name_] == name:
-                        return item["id"]
-                self.module.fail_json(msg=f"{type_.upper()} '{name}' not found. {response}")
+        params = [("project", "name"), ("region", "display_name")]
+        for type_, name_key in params:
+            self._set_entity_id(type_, name_key)
+
+    def _set_entity_id(self, entity_type: str, name_key: str):
+        entity_id = f"{entity_type}_id"
+        if self.module.params.get(entity_id):
+            setattr(self, entity_id, self.module.params[entity_id])
+        else:
+            name = self.module.params.get(f"{entity_type}_name")
+            url = f"{self.api_host}v1/{entity_type}s"
+            response, info = fetch_url(self.module, url=url, method="GET", headers=self._get_headers())
+            entity = next((item for item in self._parse_response(response, info) if item[name_key] == name), None)
+            if entity:
+                setattr(self, entity_id, entity["id"])
+            else:
+                self.module.fail_json(
+                    msg=f"{entity_type.upper()} '{name}' not found in the fetched {entity_type.capitalize()}s"
+                )
 
     def _set_api_host(self) -> str:
         api_host = self.module.params["api_host"]
@@ -124,21 +124,17 @@ class CloudAPIClient:
 
     def _parse_successful_response(self, response: Any) -> Optional[str]:
         response_text = response.read()
-
         if response_text:
-            response_json = self._get_response_json(response_text)
-            return json.dumps(response_json, ensure_ascii=False)
+            return json.dumps(self._get_response_json(response_text), ensure_ascii=False)
         return None
 
     def _get_response_json(self, response_text: str) -> dict:
         response = json.loads(to_text(response_text))
-        if "results" in response:
-            return response["results"]
-        return response
+        return response.get("results", response)
 
     def _handle_failed_response(self, info: dict) -> None:
         """Handle a failed API request by reporting an error"""
-        error_message = f"Failed to request API {info.get('url')}"
+        url = info.get("url")
         body = json.loads(info.get("body", "{}"))
         message_error = body.get("message", "")
-        self.module.fail_json(msg=error_message, message_error=message_error)
+        self.module.fail_json(msg="Failed to perfom operation", url=url, message_error=message_error)

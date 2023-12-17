@@ -33,9 +33,30 @@ class BaseResourceClient:
         return self.api_client.get(self.url, path_params=resource_id, **kwargs)
 
     def execute_command(self, command: str):
+        config = self.ACTION_CONFIG[command]
+        kwargs = self._prepare_command_kwargs(config)
+        http_method = getattr(self.api_client, config["method"])
+        kwargs["url"] = self.ACTION_CONFIG[command].get("url") or self.url
+
+        response = http_method(**kwargs)
+
+        if config.get("as_task"):
+            response = self._parse_response_as_task(response, command)
+
+        if http_method in (
+            "post",
+            "put",
+            "patch",
+            "delete",
+        ):
+            self.response["changed"] = True
+
+        self.response["data"] = response
+        return self.response
+
+    def _prepare_command_kwargs(self, config: dict):
         kwargs = {}
         params = self._clear_params(self.module.params)
-        config = self.ACTION_CONFIG.get(command)
 
         schemas = config.get("schemas")
         if schemas:
@@ -60,26 +81,7 @@ class BaseResourceClient:
                     allow_none=allow_none,
                 )
 
-        http_method = config["method"]
-        method = getattr(self.api_client, http_method)
-
-        kwargs["url"] = config.get("url") or self.url
-
-        response = method(**kwargs)
-
-        if config.get("as_task"):
-            response = self._parse_response_as_task(response, command)
-
-        if http_method in (
-            "post",
-            "put",
-            "patch",
-            "delete",
-        ):
-            self.response["changed"] = True
-
-        self.response["data"] = response
-        return self.response
+        return kwargs
 
     def _parse_response_as_task(self, response: dict, command: str):
         tasks_id = self._get_task_id_from_response(response)
@@ -135,6 +137,3 @@ class BaseResourceClient:
 
     def _clear_params(self, params: dict) -> dict:
         return {k: v for k, v in params.items() if k not in GLOBAL_PARAMS}
-
-    def _preconditions_validation(self):
-        pass
