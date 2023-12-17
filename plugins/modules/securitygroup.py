@@ -183,6 +183,12 @@ securitygroup:
             type: list
             elements: dict
             sample: [{'key': 'hosting', 'value': 'some value', 'read_only': false}]
+        tags:
+            description: Security group tags
+            returned: always
+            type: list
+            elements: str
+            sample: ['hosting']
 """
 
 from traceback import format_exc

@@ -27,6 +27,8 @@ class CopySecurityGroup(BaseSchema):
 class GetSecurityGroupList(BaseSchema):
     metadata_kv: Optional[str] = None
     metadata_v: Optional[str] = None
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
 
 @dataclass

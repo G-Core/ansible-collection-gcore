@@ -32,6 +32,17 @@ options:
             - Filter by metadata keys. Must be a valid JSON string.
         type: str
         required: false
+    limit:
+        description:
+            - Limit the number of returned limit request entities.
+        type: int
+        required: false
+    offset:
+        description:
+            - Offset value is used to exclude the first set of records from the result.
+        type: int
+        required: false
+    
 extends_documentation_fragment:
     - gcore.cloud.cloud.documentation
 """
@@ -130,6 +141,12 @@ securitygroup_info:
             type: list
             elements: dict
             sample: [{'key': 'hosting', 'value': 'some value', 'read_only': false}]
+        tags:
+            description: Security group tags
+            returned: always
+            type: list
+            elements: str
+            sample: ['hosting']
 """
 
 from traceback import format_exc
@@ -153,6 +170,8 @@ def main():
         securitygroup_id=dict(type="str", required=False),
         metadata_k=dict(type="str", required=False),
         metadata_kv=dict(type="str", required=False),
+        limit=dict(type="int", required=False),
+        offset=dict(type="int", required=False),
     )
     spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
