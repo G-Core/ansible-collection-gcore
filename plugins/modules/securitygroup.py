@@ -41,12 +41,6 @@ options:
             - Required if I(command) is create.
         type: dict
         required: false
-    metadata:
-        description:
-            - Security group metadata.
-            - Used if I(command) is create.
-        type: dict
-        required: false
     name:
         description:
             - Security group name.
@@ -73,7 +67,8 @@ EXAMPLES = """
     command: create
     security_group: {
         'description': 'My new security group',
-        'name': 'my_new_sg'
+        'name': 'my_new_sg',
+        'metadata': {'key': 'value'}
     }
 
 - name: Update securitygroup
