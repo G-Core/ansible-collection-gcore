@@ -59,11 +59,6 @@ lifecycle_policy_info:
             returned: always
             type: int
             sample: 1
-        region:
-            description: Region name
-            returned: always
-            type: str
-            sample: Luxembourg 1
         region_id:
             description: Region ID
             returned: always
@@ -90,6 +85,10 @@ lifecycle_policy_info:
                 'type': 'cron',
                 'resource_name_template': 'reserve snap of the volume volume_id',
                 'user_id': 12,
+                'day': '*',
+                'month': '*',
+                'timezone': 'Asia/Tashkent',
+                'week': '*'
             }]
         name:
             description: Policy name

@@ -154,11 +154,6 @@ lifecycle_policy:
             returned: always
             type: int
             sample: 1
-        region:
-            description: Region name
-            returned: always
-            type: str
-            sample: Luxembourg 1
         region_id:
             description: Region ID
             returned: always
