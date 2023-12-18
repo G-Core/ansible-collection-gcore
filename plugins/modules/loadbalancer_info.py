@@ -133,8 +133,8 @@ loadbalancer_info:
             description: List of VRRP IP addresses
             returned: always
             type: list
-            elements: str
-            sample: ['127.0.0.1']
+            elements: dict
+            sample: [{'vrrp_ip': '127.0.0.1'}]
         floating_ips:
             description: List of assigned floating IPs
             returned: always
@@ -181,14 +181,7 @@ loadbalancer_info:
             type: list
             elements: dict
             sample: [{
-                'id': '0b831470-0160-4601-bfd6-04a0df623eae',
-                'name': 'listener',
-                'description': 'test',
-                'protocol': 'HTTP',
-                'protocol_port': 80,
-                'operating_status': 'ONLINE',
-                'provisioning_status': 'ACTIVE',
-                'allowed_cidrs': []
+                "id": "43658ea9-54bd-4807-90b1-925921c9a0d1"
             }]
         created_at:
             description: Loadbalancer create datetime
@@ -197,12 +190,12 @@ loadbalancer_info:
             sample: 2020-01-24T13:57:12+0000
         updated_at:
             description: Loadbalancer update datetime
-            returned: if available
+            returned: always
             type: str
             sample: 2020-01-24T13:57:35+0000
         task_id:
             description: Active task. If None, action has been performed immediately in the request itself
-            returned: if available
+            returned: always
             type: str
             sample: 4966d73a-451a-4768-9fb7-65661f246fad
         stats:
@@ -231,6 +224,80 @@ loadbalancer_info:
                 'topic_name': 'some_topic_name',
                 'destination_region_id': 1,
                 'retention_policy': {'period': 45}
+            }
+        ddos_profile:
+            description: Logging configuration
+            returned: if available
+            type: dict
+            sample: {
+                'profile_template': {
+                    'id': 0,
+                    'name': 'test_client_profile_template',
+                    'description': 'test client profile template',
+                    'fields': [
+                    {
+                        'id': 11,
+                        'name': 'ARK Ports',
+                        'description': 'ARK server ports. Valid port values are in range 1000-65535',
+                        'field_type': null,
+                        'required': true,
+                        'default': null,
+                        'validation_schema': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'integer',
+                            'maximum': 65535,
+                            'minimum': 1000
+                        },
+                        'minItems': 1
+                        }
+                    }
+                    ]
+                },
+                'ip_address': '123.123.123.1',
+                'fields': [
+                    {
+                    'id': 11,
+                    'name': 'ARK Ports',
+                    'description': 'ARK server ports. Valid port values are in range 1000-65535',
+                    'field_type': null,
+                    'required': true,
+                    'default': null,
+                    'validation_schema': {
+                        'type': 'array',
+                        'items': {
+                        'type': 'integer',
+                        'maximum': 65535,
+                        'minimum': 1000
+                        },
+                        'minItems': 1
+                    },
+                    'value': null,
+                    'field_value': [
+                        45046,
+                        45047
+                    ],
+                    'base_field': 10
+                    }
+                ],
+                'id': 0,
+                'options': {
+                    'active': true,
+                    'bgp': true
+                },
+                'site': 'ED',
+                'profile_template_description': 'ARK server ports. Valid port values are in range 1000-65535',
+                'protocols': [
+                    {
+                    'additionalProp1': 'string',
+                    'additionalProp2': 'string',
+                    'additionalProp3': 'string'
+                    }
+                ],
+                'status': {
+                    'status': 'Error Deleting',
+                    'error_description': 'An error occurred while deleting profile'
+                }
             }
 """
 

@@ -29,7 +29,7 @@ options:
         required: false
     listener_id:
         description:
-            - Load balancer listener ID ID.
+            - Load balancer listener ID.
         type: str
         required: false
     details:
@@ -126,9 +126,10 @@ loadbalancer_pool_info:
             }]
         healthmonitor:
             description: Health monitor parameters
-            returned: always
+            returned: if available
             type: dict
             sample: {
+                'id': '5df62f3a-45b0-42e2-b136-86e1ffc1a53e',
                 'delay': 10,
                 'http_method': 'GET',
                 'max_retries': 3,
@@ -141,7 +142,12 @@ loadbalancer_pool_info:
             description: Session persistence parameters
             returned: always
             type: dict
-            sample: {}
+            sample: {
+                'cookie_name': 'test',
+                'persistence_granularity': null,
+                'persistence_timeout': null,
+                'type': 'APP_COOKIE'
+            }
         operating_status:
             description: Pool operating status
             returned: always

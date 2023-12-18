@@ -1,0 +1,53 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+
+  block:
+    - name: List all test images
+      gcore.cloud.image_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_images
+
+    - name: Delete all test images
+      gcore.cloud.image:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        image_id: "{{ item.id }}"
+      ignore_errors: True
+      when:
+        - item.name.startswith('test_ansible')
+      with_items: "{{ list_images.data }}"
+      loop_control:
+        label: "{{ item.name }} ({{ item.id }})"
+
+    - name: List all test volumes
+      gcore.cloud.volume_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_volumes
+
+    - name: Delete all test volumes
+      gcore.cloud.volume:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        volume_id: "{{ item.id }}"
+      ignore_errors: True
+      when:
+        - item.name.startswith('test_ansible')
+      with_items: "{{ list_volumes.data }}"
+      loop_control:
+        label: "{{ item.name }} ({{ item.id }})"

@@ -119,7 +119,7 @@ EXAMPLES = """
     region_id: "{{ region_id }}"
     project_id: "{{ project_id }}"
     command: delete
-    loadbalancer_id: "{{ loadbalancer_id }}"
+    loadbalancer_listener_id: "{{ loadbalancer_listener_id }}"
 """
 
 RETURN = """
@@ -144,7 +144,7 @@ loadbalancer_listener:
         protocol:
             description: Load balancer protocol
             returned: always
-            type: dict
+            type: str
             sample: TCP
         protocol_port:
             description: Protocol port
@@ -185,7 +185,7 @@ loadbalancer_listener:
             sample: d2d871da-d7ce-4c2b-bedc-5900c37880e6
         task_id:
             description: Active task. If None, action has been performed immediately in the request itself.
-            returned: if available
+            returned: always
             type: str
             sample: c593da0c-1fa4-4882-8d0c-c5179fbcfc71
         stats:
@@ -216,7 +216,9 @@ loadbalancer_listener:
             returned: always
             type: list
             elements: str
-            sample: []
+            sample: [
+                '10.0.0.0/32'
+            ]
 """
 
 from traceback import format_exc

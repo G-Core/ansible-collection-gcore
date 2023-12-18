@@ -149,6 +149,7 @@ EXAMPLES = """
     loadbalancer_pool_id: "{{ loadbalancer_pool_id }}"
     name: "test_lb_pool_2"
     timeout_client_data: "{{ timeout_client_data }}"
+    lb_algorithm: "{{ lb_algorithm }}"
 
 - name: Delete pool
   gcore.cloud.loadbalancer_pool:
@@ -231,7 +232,12 @@ loadbalancer_pool:
             description: Session persistence parameters
             returned: always
             type: dict
-            sample: {}
+            sample: {
+                'cookie_name': 'test',
+                'persistence_granularity': null,
+                'persistence_timeout': null,
+                'type': 'APP_COOKIE'
+            }
         operating_status:
             description: Pool operating status
             returned: always

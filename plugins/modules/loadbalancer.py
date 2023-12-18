@@ -88,13 +88,6 @@ options:
             - Used if I(command) is create
         type: dict
         required: false
-    tag:
-        description:
-            - A list of inner tags (k8s, k8s_ingress) assigned to the load balancer.
-            - Used if I(command) is create
-        type: list
-        elements: str
-        required: false
     logging:
         description:
             - Logging configuration.
@@ -190,38 +183,17 @@ loadbalancer:
             description: List of VRRP IP addresses
             returned: always
             type: list
-            elements: str
-            sample: ['127.0.0.1']
+            elements: dict
+            sample: [{'vrrp_ip': '45.67.211.68'}]
         floating_ips:
             description: List of assigned floating IPs
             returned: always
             type: list
             elements: dict
-            sample: {
-                'created_at': '2019-06-13T13:58:12+0000',
-                'creator_task_id': 'd1e1500b-e2be-40aa-9a4b-cc493fa1af30',
-                'fixed_ip_address': None,
-                'floating_ip_address': '172.24.4.34',
-                'id': 'c64e5db1-5f1f-43ec-a8d9-5090df85b82d',
-                'port_id': 'ee2402d0-f0cd-4503-9b75-69be1d11c5f1',
-                'project_id': 1,
-                'region': 'Luxembourg 1',
-                'region_id': 1,
-                'router_id': '11005a33-c5ac-4c96-ab6f-8f2827cc7da6',
-                'status': 'DOWN',
-                'updated_at': '2019-06-13T13:58:12+0000',
-                'dns_domain': 'gcore.com',
-                'dns_name': 'string',
-                'subnet_id': 'b1a3dd16-04c1-4f13-b8f9-f6569f74bb15',
-                'task_id': 'a4eb4b29-048e-42f6-a5e1-2c18bc001c45',
-                'metadata': [
-                {
-                    'key': 'hosting',
-                    'value': 'some value',
-                    'read_only': False,
-                }
-            ]
-        }
+            sample: [{
+                'existing_floating_id': 'c1b79a5f-916a-4457-b284-c61e59727751',
+                'source': 'existing'
+            }]
         operating_status:
             description: Load balancer operating status
             returned: always
@@ -254,25 +226,14 @@ loadbalancer:
             sample: 2020-01-24T13:57:12+0000
         updated_at:
             description: Loadbalancer update datetime
-            returned: if available
+            returned: always
             type: str
             sample: 2020-01-24T13:57:35+0000
         task_id:
             description: Active task. If None, action has been performed immediately in the request itself
-            returned: if available
+            returned: always
             type: str
             sample: 4966d73a-451a-4768-9fb7-65661f246fad
-        stats:
-            description: Statistic of the load balancer. It is available only in get functions by a flag
-            returned: if available
-            type: dict
-            sample: {
-                'active_connections': 0,
-                'bytes_in': 34942398609,
-                'bytes_out': 304777113641,
-                'request_errors': 4,
-                'total_connections': 21095970
-            }
         metadata:
             description: Create one or more metadata items for a loadbalancers
             returned: if available
@@ -288,6 +249,80 @@ loadbalancer:
                 'topic_name': 'some_topic_name',
                 'destination_region_id': 1,
                 'retention_policy': {'period': 45}
+            }
+        ddos_profile:
+            description: Logging configuration
+            returned: if available
+            type: dict
+            sample: {
+                'profile_template': {
+                    'id': 0,
+                    'name': 'test_client_profile_template',
+                    'description': 'test client profile template',
+                    'fields': [
+                    {
+                        'id': 11,
+                        'name': 'ARK Ports',
+                        'description': 'ARK server ports. Valid port values are in range 1000-65535',
+                        'field_type': null,
+                        'required': true,
+                        'default': null,
+                        'validation_schema': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'integer',
+                            'maximum': 65535,
+                            'minimum': 1000
+                        },
+                        'minItems': 1
+                        }
+                    }
+                    ]
+                },
+                'ip_address': '123.123.123.1',
+                'fields': [
+                    {
+                    'id': 11,
+                    'name': 'ARK Ports',
+                    'description': 'ARK server ports. Valid port values are in range 1000-65535',
+                    'field_type': null,
+                    'required': true,
+                    'default': null,
+                    'validation_schema': {
+                        'type': 'array',
+                        'items': {
+                        'type': 'integer',
+                        'maximum': 65535,
+                        'minimum': 1000
+                        },
+                        'minItems': 1
+                    },
+                    'value': null,
+                    'field_value': [
+                        45046,
+                        45047
+                    ],
+                    'base_field': 10
+                    }
+                ],
+                'id': 0,
+                'options': {
+                    'active': true,
+                    'bgp': true
+                },
+                'site': 'ED',
+                'profile_template_description': 'ARK server ports. Valid port values are in range 1000-65535',
+                'protocols': [
+                    {
+                    'additionalProp1': 'string',
+                    'additionalProp2': 'string',
+                    'additionalProp3': 'string'
+                    }
+                ],
+                'status': {
+                    'status': 'Error Deleting',
+                    'error_description': 'An error occurred while deleting profile'
+                }
             }
 """
 
@@ -322,7 +357,6 @@ def main():
         vip_port_id=dict(type="str", required=False),
         floating_ip=dict(type="dict", required=False),
         metadata=dict(type="dict", required=False),
-        tag=dict(type="list", elements="str", required=False),
         logging=dict(type="dict", required=False),
     )
     spec = AnsibleCloudClient.get_api_spec()

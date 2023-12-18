@@ -1,0 +1,43 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+    lb_listener_name: "test_ansible_listener"
+    new_lb_listener_name: "test_ansible_listener_2"
+    listener_protocol: "TCP"
+
+  block:
+    - name: Create new lb listener
+      gcore.cloud.loadbalancer_listener:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        name: "{{ lb_listener_name }}"
+        protocol: "{{ listener_protocol }}"
+        listener_protocol_port: 80
+        loadbalancer_id: "{{ created_loadbalancer.data.id }}"
+      register: created_lb_listener
+    - name: Verify lb listener
+      ansible.builtin.assert:
+        that:
+          - created_lb_listener.data.name == "{{ image_name }}"
+          - created_lb_listener.data.protocol == "{{ listener_protocol }}"
+
+    - name: Update listener's name
+      gcore.cloud.loadbalancer_listener:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        loadbalancer_listener_id: "{{ created_lb_listener.data.id }}"
+        name: "{{ new_lb_listener_name }}"
+      register: updated_lb_listener
+    - name: Verify new listener name
+      ansible.builtin.assert:
+        that:
+          - updated_lb_listener.data.name == "{{ new_lb_listener_name }}"

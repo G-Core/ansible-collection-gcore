@@ -86,11 +86,6 @@ loadbalancer_listener_info:
             returned: always
             type: int
             sample: 80
-        loadbalancer_id:
-            description: Load balancer ID
-            returned: always
-            type: str
-            sample: 61d0a6c0-3676-4b5b-9455-03efff0143d3
         insert_headers:
             description:
                 - Dictionary of additional header insertion into HTTP headers.
@@ -120,7 +115,7 @@ loadbalancer_listener_info:
             sample: d2d871da-d7ce-4c2b-bedc-5900c37880e6
         task_id:
             description: Active task. If None, action has been performed immediately in the request itself.
-            returned: if available
+            returned: always
             type: str
             sample: c593da0c-1fa4-4882-8d0c-c5179fbcfc71
         stats:
@@ -142,7 +137,7 @@ loadbalancer_listener_info:
         sni_secret_id:
             description:
                 - List of secret's ID containing PKCS12 format certificate/key bundles for TERMINATED_HTTPS listeners.
-            returned: always
+            returned: if available
             type: list
             elements: str
             sample: ['e76a3f17-f5a1-4efa-8917-c6c2e8eb157c']
