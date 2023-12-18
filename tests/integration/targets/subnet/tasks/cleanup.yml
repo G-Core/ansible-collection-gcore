@@ -28,3 +28,26 @@
       with_items: "{{ list_subnets.data }}"
       loop_control:
         label: "{{ item.name }} ({{ item.id }})"
+
+    - name: List all test networks
+      gcore.cloud.network_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_networks
+
+    - name: Delete all test networks
+      gcore.cloud.network:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        network_id: "{{ item.id }}"
+      ignore_errors: True
+      when:
+        - item.name.startswith('test_ansible')
+      with_items: "{{ list_networks.data }}"
+      loop_control:
+        label: "{{ item.name }} ({{ item.id }})"

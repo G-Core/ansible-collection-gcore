@@ -97,7 +97,3 @@
       ansible.builtin.assert:
         that:
           - retyped_volume.data.volume_type == "{{ new_volume_type_name }}"
-
-  always:
-    - name: Cleanup volumes
-      import_tasks: ./targets/common/tasks/cleanup_volumes.yml

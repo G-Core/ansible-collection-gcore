@@ -161,3 +161,4 @@ cython_debug/
 output/
 
 *.gz
+integration_config.yml

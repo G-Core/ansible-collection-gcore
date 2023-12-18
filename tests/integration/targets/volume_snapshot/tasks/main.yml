@@ -2,3 +2,6 @@
 - block:
     - import_tasks: setup.yml
     - import_tasks: tests.yml
+  always:
+    - name: Cleanup subnets
+      include_tasks: cleanup.yml

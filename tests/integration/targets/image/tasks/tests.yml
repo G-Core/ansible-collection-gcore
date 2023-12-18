@@ -41,9 +41,3 @@
       ansible.builtin.assert:
         that:
           - updated_image.data.name == "{{ new_image_name }}"
-
-  always:
-    - name: Cleanup images
-      import_tasks: ./targets/common/tasks/cleanup_images.yml
-    - name: Cleanup volumes
-      import_tasks: ./targets/common/tasks/cleanup_volumes.yml

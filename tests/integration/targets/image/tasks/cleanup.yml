@@ -28,3 +28,26 @@
       with_items: "{{ list_images.data }}"
       loop_control:
         label: "{{ item.name }} ({{ item.id }})"
+
+    - name: List all test volumes
+      gcore.cloud.volume_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: list_volumes
+
+    - name: Delete all test volumes
+      gcore.cloud.volume:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        volume_id: "{{ item.id }}"
+      ignore_errors: True
+      when:
+        - item.name.startswith('test_ansible')
+      with_items: "{{ list_volumes.data }}"
+      loop_control:
+        label: "{{ item.name }} ({{ item.id }})"
