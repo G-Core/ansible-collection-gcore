@@ -29,18 +29,17 @@ ansible-galaxy collection install <path_to_tarball_from_previous_command>
 
 Once installed, you can reference a collection content by its fully qualified collection name (FQCN).
 
-Example `local_playbook.yml` can be found in the `tests/integration` directory.
-To run it, provide required config variables under `tests/integration/config.yml`
+To run integration tests, provide required config variables under `tests/integration/integration_config.yml`
 
 | key              | value                 |
 |------------------|-----------------------|
 | API_KEY    | Yor api key           |
 | API_HOST   | Your local api url    |
 | PROJECT_ID | Your local project ID |
-| REGION_ID  | ED-10 region ID       |
+| REGION_ID  | Your region ID       |
 
-and from the `tests/integration` dir execute the command:
+and execute the command:
 
 ```
-ansible-playbook -i localhost, local_playbook.yml -vvvv
+ansible-test integration volume --docker -v --diff --color
 ```
