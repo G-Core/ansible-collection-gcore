@@ -18,3 +18,5 @@ action_groups:
     - keypair_info
     - servergroup
     - servergroup_info
+    - lifecycle_policy_info
+    - lifecycle_policy

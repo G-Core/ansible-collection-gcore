@@ -6,8 +6,13 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.image import (
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.instance import (
     CloudInstanceClient,
 )
+<<<<<<< HEAD
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.keypair import (
     CloudKeypairClient,
+=======
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.lifecycle_policy import (
+    CloudLifecyclePolicyClient,
+>>>>>>> 3605c3c (Added lifecycle policy)
 )
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
     CloudNetworkClient,
@@ -68,6 +73,8 @@ class AnsibleCloudClient:
 
     def servergroups(self) -> CloudServerGroupClient:
         return CloudServerGroupClient(self.module, "v1/servergroups/")
+    def lifecycle_policy(self) -> CloudLifecyclePolicyClient:
+        return CloudLifecyclePolicyClient(self.module, "v1/lifecycle_policy/")
 
     @staticmethod
     def get_api_spec() -> dict:
