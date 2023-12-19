@@ -55,9 +55,7 @@ class CreateSecurityGroupRule(BaseSchema):
     remote_ip_prefix: Optional[str] = None
     protocol: Optional[SecurityGroupProtocol] = None
     id: Optional[str] = None
-    security_group_id: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
+    securitygroup_id: Optional[str] = None
     revision_number: Optional[int] = None
 
 

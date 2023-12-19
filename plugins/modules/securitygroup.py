@@ -210,7 +210,6 @@ def main():
         securitygroup_id=dict(type="str", required=False),
         instances=dict(type="list", elements="str", required=False),
         security_group=dict(type="dict", required=False),
-        metadata=dict(type="dict", required=False),
         name=dict(type="str", required=False),
         changed_rules=dict(type="list", elements="dict", required=False),
     )

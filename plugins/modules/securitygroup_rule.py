@@ -116,24 +116,6 @@ options:
             - Used if I(command) is create.
         type: str
         required: false
-    security_group_id:
-        description:
-            - Parent security group of this rule.
-            - Used if I(command) is create.
-        type: str
-        required: false
-    created_at:
-        description:
-            - Datetime when the rule was created.
-            - Used if I(command) is create.
-        type: str
-        required: false
-    updated_at:
-        description:
-            - Datetime when the rule was last updated.
-            - Used if I(command) is create.
-        type: str
-        required: false
     revision_number:
         description:
             - The number of revisions.
@@ -276,9 +258,6 @@ def main():
         remote_ip_prefix=dict(type="str", required=False),
         protocol=dict(type="str", choices=list(SecurityGroupProtocol), required=False),
         id=dict(type="str", required=False),
-        security_group_id=dict(type="str", required=False),
-        created_at=dict(type="str", required=False),
-        updated_at=dict(type="str", required=False),
         revision_number=dict(type="int", required=False),
     )
     spec = AnsibleCloudClient.get_api_spec()

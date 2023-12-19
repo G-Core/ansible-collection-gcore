@@ -42,7 +42,6 @@ options:
             - Offset value is used to exclude the first set of records from the result.
         type: int
         required: false
-    
 extends_documentation_fragment:
     - gcore.cloud.cloud.documentation
 """
