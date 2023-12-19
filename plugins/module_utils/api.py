@@ -30,6 +30,9 @@ class CloudAPIClient:
     def patch(self, url: str, **kwargs) -> Optional[str]:
         return self._request(method="PATCH", url=url, **kwargs)
 
+    def put(self, url: str, **kwargs) -> Optional[str]:
+        return self._request(method="PUT", url=url, **kwargs)
+
     def delete(self, url: str, **kwargs) -> Optional[str]:
         kwargs.pop("data", None)
         return self._request(method="DELETE", url=url, data=None, **kwargs)
