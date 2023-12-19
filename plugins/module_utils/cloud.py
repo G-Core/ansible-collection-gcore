@@ -15,6 +15,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.router import (
     CloudRouterClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.servergroup import (
+    CloudServerGroupClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.snapshot import (
     CloudSnapshotClient,
 )
@@ -62,6 +65,9 @@ class AnsibleCloudClient:
     @property
     def keypairs(self) -> CloudKeypairClient:
         return CloudKeypairClient(self.module, "v1/keypairs/")
+
+    def servergroups(self) -> CloudServerGroupClient:
+        return CloudServerGroupClient(self.module, "v1/servergroups/")
 
     @staticmethod
     def get_api_spec() -> dict:
