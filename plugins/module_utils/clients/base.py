@@ -88,8 +88,13 @@ class BaseResourceClient:
         task_info = self._wait_from_task(tasks_id)
         resource_id = None
         if command in ("delete",):
-            postfix = "uuid" if self.RESOURCE in ("instance",) else "id"
-            resource_id = task_info["data"][f"{self.RESOURCE}_{postfix}"]
+            if self.RESOURCE == "instance":
+                resource_key = f"{self.RESOURCE}_uuid"
+            elif self.RESOURCE == "secret":
+                resource_key = "resource_id"
+            else:
+                resource_key = f"{self.RESOURCE}_id"
+            resource_id = task_info["data"][resource_key]
             return {f"{self.RESOURCE}_id": resource_id}
         if command in (
             "create",

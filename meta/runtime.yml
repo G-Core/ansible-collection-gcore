@@ -32,3 +32,5 @@ action_groups:
     - loadbalancer_member
     - loadbalancer_pool
     - loadbalancer_pool_info
+    - secret
+    - secret_info
