@@ -128,7 +128,8 @@ options:
     servergroup_id:
         description:
             - Anti-affinity or affinity or soft-anti-affinity server group ID.
-            - Optional if I(command) is create or add_to_servergroup.
+            - Optional if I(command) is create.
+            - Required if I(command) is add_to_servergroup.
         type: str
         required: false
     floatings:

@@ -68,9 +68,9 @@ EXAMPLES = """
         {
             'network_id': '783b36b4-3ef4-48ac-879d-5b3ea53180d8',
             'subnet_id': '382a83e5-1b38-49f9-bd83-730353b29ed4',
-            'type': 'SUBNET',
+            'type': 'subnet',
         },
-        {'type': 'EXTERNAL'}
+        {'type': 'external'}
     ]
 """
 
