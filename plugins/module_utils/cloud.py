@@ -42,6 +42,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup 
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup_rule import (
     CloudSecurityGroupRuleClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.secret import (
+    CloudSecretClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.snapshot import (
     CloudSnapshotClient,
 )
@@ -125,6 +128,10 @@ class AnsibleCloudClient:
     @property
     def loadbalancer_members(self) -> CloudLbPoolMemberClient:
         return CloudLbPoolMemberClient(self.module, "v1/lbpools/")
+
+    @property
+    def secrets(self) -> CloudSecretClient:
+        return CloudSecretClient(self.module, "v1/secrets/")
 
     @staticmethod
     def get_api_spec() -> dict:
