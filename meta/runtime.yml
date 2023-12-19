@@ -16,3 +16,5 @@ action_groups:
     - subnet_info
     - keypair
     - keypair_info
+    - servergroup
+    - servergroup_info
