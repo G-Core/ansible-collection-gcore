@@ -24,6 +24,12 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.router import 
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.servergroup import (
     CloudServerGroupClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup import (
+    CloudSecurityGroupClient,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup_rule import (
+    CloudSecurityGroupRuleClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.snapshot import (
     CloudSnapshotClient,
 )
@@ -83,6 +89,14 @@ class AnsibleCloudClient:
     @property
     def reserved_fips(self) -> CloudReservedFipClient:
         return CloudReservedFipClient(self.module, "v1/reserved_fixed_ips/")
+
+    @property
+    def securitygroups(self) -> CloudSecurityGroupClient:
+        return CloudSecurityGroupClient(self.module, "v1/securitygroups/")
+
+    @property
+    def securitygroup_rules(self) -> CloudSecurityGroupRuleClient:
+        return CloudSecurityGroupRuleClient(self.module, "v1/securitygroups/")
 
     @staticmethod
     def get_api_spec() -> dict:

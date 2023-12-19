@@ -1,0 +1,89 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+    volume_source: "new-volume"
+    volume_type_name: "standard"
+    new_volume_type_name: "ssd_hiiops"
+    securitygroup_name: "test_ansible_securitygroup"
+    updated_securitygroup_name: "test_ansible_updated_securitygroup"
+    copied_securitygroup_name: "test_ansible_securitygroup_copy"
+
+  block:
+    - name: Create new securitygroup
+      gcore.cloud.securitygroup:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        security_group: {
+          'name': "{{ securitygroup_name }}"
+        }
+      register: created_securitygroup
+    - name: Verify securitygroup
+      ansible.builtin.assert:
+        that:
+          - created_securitygroup.data.name == "{{ securitygroup_name }}"
+          - created_securitygroup.data.security_group_rules | list | length >= 1
+
+    - name: Update securitygroup
+      gcore.cloud.securitygroup:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        securitygroup_id: "{{ created_securitygroup.data.id }}"
+        name: "{{ updated_securitygroup_name }}"
+      register: updated_securitygroup
+    - name: Verify updating securitygroup
+      ansible.builtin.assert:
+        that:
+          - updated_securitygroup.data.name == "{{ updated_securitygroup_name }}"
+
+    - name: Copy securitygroup
+      gcore.cloud.securitygroup:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: copy
+        securitygroup_id: "{{ updated_securitygroup.data.id }}"
+        name: "{{ copied_securitygroup_name }}"
+      register: copied_securitygroup
+    - name: Verify securitygroup copy
+      ansible.builtin.assert:
+        that:
+          - copied_securitygroup.data.name == "{{ copied_securitygroup_name }}"
+    
+    - name: Get list securitygroup
+      gcore.cloud.securitygroup_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+      register: securitygroup_list
+    - name: Verify securitygroup list
+      ansible.builtin.assert:
+        that:
+          - securitygroup_list.data | list | length >= 2
+
+    - name: Get securitygroup by id
+      gcore.cloud.securitygroup_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        securitygroup_id: "{{ copied_securitygroup.data.id }}"
+      register: securitygroup
+    - name: Verify securitygroup
+      ansible.builtin.assert:
+        that:
+          - copied_securitygroup.data.name == "{{ copied_securitygroup_name }}"
+
+  always:
+    - name: Cleanup securitygroups
+      import_tasks: ./targets/common/tasks/cleanup_securitygroups.yml
