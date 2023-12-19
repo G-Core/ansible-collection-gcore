@@ -22,3 +22,6 @@ action_groups:
     - lifecycle_policy
     - reserved_fixed_ip
     - reserved_fixed_ip_info
+    - securitygroup
+    - securitygroup_info
+    - securitygroup_rule

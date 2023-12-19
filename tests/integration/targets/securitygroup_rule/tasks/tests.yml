@@ -1,0 +1,65 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+
+  block:
+    - name: Create new rule for securitygroup
+      gcore.cloud.securitygroup_rule:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        securitygroup_id: "{{ created_securitygroup.data.id }}"
+        direction: "ingress"
+        ethertype: "IPv4"
+      register: created_rule
+    - name: Verify rule
+      ansible.builtin.assert:
+        that:
+          - created_rule.data.security_group_id == "{{ created_securitygroup.data.id }}"
+          - created_rule.data.direction == "ingress"
+          - created_rule.data.ethertype == "IPv4"
+
+    - name: Get securitygroup by id
+      gcore.cloud.securitygroup_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        securitygroup_id: "{{ created_securitygroup.data.id }}"
+      register: securitygroup
+    - name: Verify securitygroup
+      ansible.builtin.assert:
+        that:
+          - securitygroup.data.security_group_rules | list | length == created_securitygroup.data.security_group_rules | list | length + 1
+
+    - name: Delete rule from securitygroup
+      gcore.cloud.securitygroup_rule:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        securitygroup_rule_id: "{{ created_rule.data.id }}"
+
+    - name: Get securitygroup by id second time
+      gcore.cloud.securitygroup_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        securitygroup_id: "{{ created_securitygroup.data.id }}"
+      register: updated_securitygroup
+    - name: Verify updated securitygroup
+      ansible.builtin.assert:
+        that:
+          - updated_securitygroup.data.security_group_rules | list | length == created_securitygroup.data.security_group_rules | list | length
+
+
+  always:
+    - name: Cleanup securitygroups
+      import_tasks: ./targets/common/tasks/cleanup_securitygroups.yml
