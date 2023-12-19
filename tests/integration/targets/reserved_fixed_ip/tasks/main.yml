@@ -1,0 +1,52 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+    reserved_fip_type: "external"
+    reserved_fip_name: "test_ansible_reserved_fip"
+    new_reserved_fip_name: "test_ansible_reserved_fip_2"
+
+  block:
+    - name: Init empty reserved fip list
+      set_fact:
+        fips_to_delete: []
+
+    - name: Create new reserved fixed ip
+      gcore.cloud.reserved_fixed_ip:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        type: "{{ reserved_fip_type }}"
+      register: created_fip
+    - name: Verify reserved fip
+      ansible.builtin.assert:
+        that:
+          - created_fip.data.status == "DOWN"
+          - created_fip.data.is_vip == false
+          - created_fip.data.is_external == true
+
+    - name: Update reserved fixed IP
+      gcore.cloud.reserved_fixed_ip:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        is_vip: true
+      register: updated_fip
+    - name: Verify updated fip
+      ansible.builtin.assert:
+        that:
+          - created_fip.data.is_vip == true
+
+    - name: Append IP to reserved fip list
+      set_fact:
+        fips_to_delete: "{{ fips + ['{{ updated_fip.data.port_id }}'] }}"
+
+  always:
+    - name: Cleanup reserved fixed ips
+      import_tasks: ./targets/common/tasks/cleanup_reserved_fixed_ips.yml

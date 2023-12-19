@@ -62,8 +62,8 @@ class BaseResourceClient:
         if schemas:
             first_key = next(iter(schemas))
             if isinstance(schemas[first_key], dict):
-                schemas = schemas.get(params.get("source", "default"))
-
+                key = "type" if self.RESOURCE == "port" else "source"
+                schemas = schemas.get(params.get(key, "default"))
             allow_none = config.get("allow_none")
 
             if schemas.get("query_params"):

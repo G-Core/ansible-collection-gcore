@@ -20,3 +20,5 @@ action_groups:
     - servergroup_info
     - lifecycle_policy_info
     - lifecycle_policy
+    - reserved_fixed_ip
+    - reserved_fixed_ip_info

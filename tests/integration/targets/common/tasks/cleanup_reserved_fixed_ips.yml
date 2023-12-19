@@ -1,0 +1,18 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+
+  block:
+    - name: Delete all test reserved fips
+      gcore.cloud.reserved_fixed_ip:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: delete
+        port_id: "{{ item }}"
+      ignore_errors: True
+      loop: "{{ fips_to_delete }}"
