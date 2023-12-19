@@ -103,11 +103,11 @@ EXAMPLES = """
     region_id: "{{ region_id }}"
     project_id: "{{ project_id }}"
     command: create
-    expiration: "2025-12-28T19:14:44.180394",
-    name: "AES key",
-    payload: "aGVsbG8sIHRlc3Qgc3RyaW5nCg==",
-    payload_content_encoding: "base64",
-    payload_content_type: "application/octet-stream",
+    expiration: "2025-12-28T19:14:44.180394"
+    name: "AES key"
+    payload: "aGVsbG8sIHRlc3Qgc3RyaW5nCg=="
+    payload_content_encoding: "base64"
+    payload_content_type: "application/octet-stream"
     secret_type: "certificate"
 
 - name: Delete secret
@@ -115,7 +115,6 @@ EXAMPLES = """
     api_key: "{{ api_key }}"
     region_id: "{{ region_id }}"
     project_id: "{{ project_id }}"
-    secret_id: "{{ secret_id }}"
     comamnd: delete
     secret_id: "{{ secret_id }}"
 """
@@ -147,12 +146,12 @@ secret:
             description: Datetime when the secret was created
             returned: always
             type: str
-            sample: 2023-03-23T20:00:00+00:00
+            sample: '2023-03-23T20:00:00+00:00'
         expiration:
             description: Datetime when the secret will expire
             returned: if available
             type: str
-            sample: 2023-06-23T20:00:00+00:00
+            sample: '2023-06-23T20:00:00+00:00'
         mode:
             description: Metadata provided by a user or system for informational purposes
             returned: always
