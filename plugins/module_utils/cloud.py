@@ -12,6 +12,18 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.keypair import
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.lifecycle_policy import (
     CloudLifecyclePolicyClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.loadbalancer import (
+    CloudLoadbalancerClient,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.loadbalancer_listener import (
+    CloudLbListenerClient,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.loadbalancer_member import (
+    CloudLbPoolMemberClient,
+)
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.loadbalancer_pool import (
+    CloudLbPoolClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
     CloudNetworkClient,
 )
@@ -97,6 +109,22 @@ class AnsibleCloudClient:
     @property
     def securitygroup_rules(self) -> CloudSecurityGroupRuleClient:
         return CloudSecurityGroupRuleClient(self.module, "v1/securitygroups/")
+
+    @property
+    def loadbalancers(self) -> CloudLoadbalancerClient:
+        return CloudLoadbalancerClient(self.module, "v1/loadbalancers/")
+
+    @property
+    def loadbalancer_listeners(self) -> CloudLbListenerClient:
+        return CloudLbListenerClient(self.module, "v1/lblisteners/")
+
+    @property
+    def loadbalancer_pools(self) -> CloudLbPoolClient:
+        return CloudLbPoolClient(self.module, "v1/lbpools/")
+
+    @property
+    def loadbalancer_members(self) -> CloudLbPoolMemberClient:
+        return CloudLbPoolMemberClient(self.module, "v1/lbpools/")
 
     @staticmethod
     def get_api_spec() -> dict:

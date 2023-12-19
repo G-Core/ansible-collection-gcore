@@ -96,6 +96,8 @@ class BaseResourceClient:
             "download",
         ):
             resource_id = task_info["created_resources"][f"{self.RESOURCE}s"][0]
+            if self.RESOURCE == "member":
+                resource_id = task_info["data"]["pool_id"]
         elif command in ("extend", "revert", "attach", "detach"):
             resource_id = task_info["data"][f"{self.RESOURCE}_id"]
         if resource_id:
