@@ -15,6 +15,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.lifecycle_poli
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
     CloudNetworkClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.reserved_fip import (
+    CloudReservedFipClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.router import (
     CloudRouterClient,
 )
@@ -69,10 +72,17 @@ class AnsibleCloudClient:
     def keypairs(self) -> CloudKeypairClient:
         return CloudKeypairClient(self.module, "v1/keypairs/")
 
+    @property
     def servergroups(self) -> CloudServerGroupClient:
         return CloudServerGroupClient(self.module, "v1/servergroups/")
+
+    @property
     def lifecycle_policy(self) -> CloudLifecyclePolicyClient:
         return CloudLifecyclePolicyClient(self.module, "v1/lifecycle_policy/")
+
+    @property
+    def reserved_fips(self) -> CloudReservedFipClient:
+        return CloudReservedFipClient(self.module, "v1/reserved_fixed_ips/")
 
     @staticmethod
     def get_api_spec() -> dict:
