@@ -112,7 +112,7 @@ EXAMPLES = """
     api_key: "{{ api_key }}"
     region_id: "{{ region_id }}"
     project_id: "{{ project_id }}"
-    comamnd: update
+    command: update
     loadbalancer_id: "{{ loadbalancer_id }}"
     name: 'new-name'
 
@@ -121,7 +121,7 @@ EXAMPLES = """
     api_key: "{{ api_key }}"
     region_id: "{{ region_id }}"
     project_id: "{{ project_id }}"
-    comamnd: delete
+    command: delete
     loadbalancer_id: "{{ loadbalancer_id }}"
 """
 
