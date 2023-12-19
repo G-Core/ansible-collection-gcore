@@ -3,5 +3,5 @@
     - import_tasks: setup.yml
     - import_tasks: tests.yml
   always:
-    - name: Cleanup images
+    - name: Cleanup loadbalancers
       include_tasks: cleanup.yml

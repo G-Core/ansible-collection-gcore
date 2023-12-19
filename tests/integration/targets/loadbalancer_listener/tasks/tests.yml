@@ -18,13 +18,13 @@
         command: create
         name: "{{ lb_listener_name }}"
         protocol: "{{ listener_protocol }}"
-        listener_protocol_port: 80
+        protocol_port: 80
         loadbalancer_id: "{{ created_loadbalancer.data.id }}"
       register: created_lb_listener
     - name: Verify lb listener
       ansible.builtin.assert:
         that:
-          - created_lb_listener.data.name == "{{ image_name }}"
+          - created_lb_listener.data.name == "{{ lb_listener_name }}"
           - created_lb_listener.data.protocol == "{{ listener_protocol }}"
 
     - name: Update listener's name
