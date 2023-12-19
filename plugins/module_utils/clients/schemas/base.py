@@ -21,7 +21,7 @@ class BaseSchema:
                 filtered_data[field_name] = v
 
         missing_fields = [
-            field for field, value in schema_fields.items() if value is MISSING and not filtered_data.get(field)
+            field for field, value in schema_fields.items() if value is MISSING and filtered_data.get(field) is None
         ]
         if missing_fields:
             raise ValidationError(f"Expected required params: {', '.join(missing_fields)}")
