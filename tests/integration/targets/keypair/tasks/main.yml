@@ -29,6 +29,7 @@
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
+        keypair_id: "{{ created_keypair.data.sshkey_id }}"
         command: share
         shared_in_project: false
 
@@ -38,7 +39,7 @@
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
-        keypair_id: "{{ created_keypair }}"
+        keypair_id: "{{ created_keypair.data.sshkey_id }}"
       register: keypair
     - name: Verify keypair
       ansible.builtin.assert:

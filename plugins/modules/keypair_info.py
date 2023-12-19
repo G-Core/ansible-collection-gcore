@@ -117,7 +117,7 @@ def manage(module: AnsibleModule):
     keypair_id = module.params.get("keypair_id")
     command = "get_by_id" if keypair_id else "get_list"
     result = api.keypairs.execute_command(command=command)
-    module.exit_json(changed=False, data=result)
+    module.exit_json(**result)
 
 
 def main():

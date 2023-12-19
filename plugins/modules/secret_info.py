@@ -114,7 +114,7 @@ def manage(module: AnsibleModule):
     secret_id = module.params.get("secret_id")
     command = "get_by_id" if secret_id else "get_list"
     result = api.secrets.execute_command(command=command)
-    module.exit_json(changed=False, data=result)
+    module.exit_json(**result)
 
 
 def main():

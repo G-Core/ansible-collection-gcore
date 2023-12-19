@@ -161,7 +161,7 @@ def manage(module: AnsibleModule):
     securitygroup_id = module.params.get("securitygroup_id")
     command = "get_by_id" if securitygroup_id else "get_list"
     result = api.securitygroups.execute_command(command=command)
-    module.exit_json(changed=False, data=result)
+    module.exit_json(**result)
 
 
 def main():
