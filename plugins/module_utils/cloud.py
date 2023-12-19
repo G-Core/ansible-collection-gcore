@@ -6,6 +6,9 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.image import (
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.instance import (
     CloudInstanceClient,
 )
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.keypair import (
+    CloudKeypairClient,
+)
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.network import (
     CloudNetworkClient,
 )
@@ -55,6 +58,10 @@ class AnsibleCloudClient:
     @property
     def subnets(self) -> CloudSubnetClient:
         return CloudSubnetClient(self.module, "v1/subnets/")
+
+    @property
+    def keypairs(self) -> CloudKeypairClient:
+        return CloudKeypairClient(self.module, "v1/keypairs/")
 
     @staticmethod
     def get_api_spec() -> dict:
