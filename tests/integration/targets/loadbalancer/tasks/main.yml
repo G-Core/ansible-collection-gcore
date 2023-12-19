@@ -1,0 +1,6 @@
+---
+- block:
+    - import_tasks: tests.yml
+  always:
+    - name: Cleanup loadbalancers
+      include_tasks: cleanup.yml

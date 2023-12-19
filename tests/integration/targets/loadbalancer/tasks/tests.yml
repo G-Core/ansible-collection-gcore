@@ -1,0 +1,38 @@
+---
+- vars:
+    api_key: "{{ API_KEY }}"
+    api_host: "{{ API_HOST }}"
+    project_id: "{{ PROJECT_ID }}"
+    region_id: "{{ REGION_ID }}"
+    loadbalancer_name: "test_ansible_loadbalancer"
+    new_loadbalancer_name: "test_ansible_loadbalancer_2"
+
+  block:
+    - name: Create new loadbalancer
+      gcore.cloud.loadbalancer:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: create
+        name: "{{ loadbalancer_name }}"
+      register: created_loadbalancer
+    - name: Verify loadbalancer
+      ansible.builtin.assert:
+        that:
+          - created_loadbalancer.data.name == "{{ loadbalancer_name }}"
+
+    - name: Update existing loadbalancer's name
+      gcore.cloud.loadbalancer:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        loadbalancer_id: "{{ created_loadbalancer.data.id }}"
+        name: "{{ new_loadbalancer_name }}"
+      register: updated_loadbalancer
+    - name: Verify name updated
+      ansible.builtin.assert:
+        that:
+          - updated_loadbalancer.data.name == "{{ new_loadbalancer_name }}"

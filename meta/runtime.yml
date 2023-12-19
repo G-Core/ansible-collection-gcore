@@ -25,3 +25,10 @@ action_groups:
     - securitygroup
     - securitygroup_info
     - securitygroup_rule
+    - loadbalancer
+    - loadbalancer_info
+    - loadbalancer_listener
+    - loadbalancer_listener_info
+    - loadbalancer_member
+    - loadbalancer_pool
+    - loadbalancer_pool_info
