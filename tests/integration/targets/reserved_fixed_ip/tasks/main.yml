@@ -35,17 +35,18 @@
         api_host: "{{ api_host }}"
         project_id: "{{ project_id }}"
         region_id: "{{ region_id }}"
+        port_id: "{{ created_fip.data.port_id }}"
         command: update
         is_vip: true
       register: updated_fip
     - name: Verify updated fip
       ansible.builtin.assert:
         that:
-          - created_fip.data.is_vip == true
+          - updated_fip.data.is_vip == true
 
     - name: Append IP to reserved fip list
       set_fact:
-        fips_to_delete: "{{ fips + ['{{ updated_fip.data.port_id }}'] }}"
+        fips_to_delete: "{{ fips_to_delete + ['{{ updated_fip.data.port_id }}'] }}"
 
   always:
     - name: Cleanup reserved fixed ips

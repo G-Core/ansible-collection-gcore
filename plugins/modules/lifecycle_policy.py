@@ -222,7 +222,7 @@ def manage(module: AnsibleModule):
     api = AnsibleCloudClient(module)
     command = module.params.pop("command")
     result = api.lifecycle_policy.execute_command(command=command)
-    module.exit_json(changed=True, data=result)
+    module.exit_json(**result)
 
 
 def main():

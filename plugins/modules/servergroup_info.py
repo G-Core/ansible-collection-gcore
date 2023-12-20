@@ -99,7 +99,7 @@ def manage(module: AnsibleModule):
     servergroup_id = module.params.get("servergroup_id")
     command = "get_by_id" if servergroup_id else "get_list"
     result = api.servergroups.execute_command(command=command)
-    module.exit_json(changed=False, data=result)
+    module.exit_json(**result)
 
 
 def main():

@@ -39,5 +39,5 @@
 
 
   always:
-    - name: Cleanup volumes
+    - name: Cleanup servergroups
       import_tasks: ./targets/common/tasks/cleanup_servergroups.yml
