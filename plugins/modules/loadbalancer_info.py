@@ -314,7 +314,7 @@ def manage(module: AnsibleModule):
     loadbalancer_id = module.params.get("loadbalancer_id")
     command = "get_by_id" if loadbalancer_id else "get_list"
     result = api.loadbalancers.execute_command(command=command)
-    module.exit_json(changed=False, data=result)
+    module.exit_json(**result)
 
 
 def main():

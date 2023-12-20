@@ -73,11 +73,11 @@ class CloudAPIClient:
         url = f"{self.api_host}{url}"
         if include_project_region:
             url += f"{self.project_id}/{self.region_id}"
+        if path_params:
+            url = urljoin(url + "/", path_params)
         if query_params:
             query_str = urlencode(query_params)
             url = f"{url}?{query_str}"
-        if path_params:
-            url = urljoin(url + "/", path_params)
         return url
 
     def _prepare_data(self, data: Optional[dict]) -> Optional[str]:

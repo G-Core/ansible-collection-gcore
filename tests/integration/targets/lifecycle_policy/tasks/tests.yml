@@ -72,7 +72,7 @@
         need_volumes: true
       register: policy_with_volumes
 
-    - name: Validate policys volumes
+    - name: Validate policies volumes
       ansible.builtin.assert:
         that:
           - policy_with_volumes.data.volumes[0].volume_id == "{{ created_volume.data.id }}"

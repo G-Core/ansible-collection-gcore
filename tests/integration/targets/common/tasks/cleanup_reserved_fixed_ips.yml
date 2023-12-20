@@ -6,6 +6,18 @@
     region_id: "{{ REGION_ID }}"
 
   block:
+    - name: Switch all fips to is_vip false
+      gcore.cloud.reserved_fixed_ip:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        command: update
+        is_vip: false
+        port_id: "{{ item }}"
+      ignore_errors: True
+      loop: "{{ fips_to_delete }}"
+
     - name: Delete all test reserved fips
       gcore.cloud.reserved_fixed_ip:
         api_key: "{{ api_key }}"

@@ -36,3 +36,18 @@
       ansible.builtin.assert:
         that:
           - updated_loadbalancer.data.name == "{{ new_loadbalancer_name }}"
+
+    - name: Get loadbalancer with stats
+      gcore.cloud.loadbalancer_info:
+        api_key: "{{ api_key }}"
+        api_host: "{{ api_host }}"
+        project_id: "{{ project_id }}"
+        region_id: "{{ region_id }}"
+        loadbalancer_id: "{{ created_loadbalancer.data.id }}"
+        show_stats: true
+      register: loadbalancer_with_stats
+
+    - name: Verify get loadbalancer with params
+      ansible.builtin.assert:
+        that:
+          - loadbalancer_with_stats.data.stats.active_connections == 0

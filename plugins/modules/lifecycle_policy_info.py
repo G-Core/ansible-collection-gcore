@@ -131,7 +131,7 @@ def manage(module: AnsibleModule):
     lifecycle_policy_id = module.params.get("lifecycle_policy_id")
     command = "get_by_id" if lifecycle_policy_id else "get_list"
     result = api.lifecycle_policy.execute_command(command=command)
-    module.exit_json(changed=False, data=result)
+    module.exit_json(**result)
 
 
 def main():
@@ -141,7 +141,18 @@ def main():
     )
     spec = AnsibleCloudClient.get_api_spec()
     spec.update(module_spec)
-    module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=spec,
+        mutually_exclusive=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        required_one_of=[
+            ("project_id", "project_name"),
+            ("region_id", "region_name"),
+        ],
+        supports_check_mode=True
+    )
     try:
         manage(module)
     except Exception as exc:
