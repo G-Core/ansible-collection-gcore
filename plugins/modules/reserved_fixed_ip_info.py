@@ -59,7 +59,7 @@ options:
         required: false
     order_by:
         description:
-            - Ordering reserved fixed IP list result 
+            - Ordering reserved fixed IP list result
         type: str
         required: false
     ip_address:
@@ -68,7 +68,7 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-    - gcore.cloud.gcore.documentation
+    - gcore.cloud.cloud.documentation
 """
 
 EXAMPLES = """
