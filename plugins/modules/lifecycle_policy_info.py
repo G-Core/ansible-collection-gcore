@@ -111,7 +111,7 @@ lifecycle_policy_info:
             type: str
             sample: active
         volumes:
-            desciption: Data of volumes which should be reserved.
+            description: Data of volumes which should be reserved.
             returned: if available
             type: list
             elements: dict

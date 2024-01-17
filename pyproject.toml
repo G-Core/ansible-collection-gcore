@@ -9,6 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "~3.10"
 ansible-core = "^2.15.5"
+ansible = "^9.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
