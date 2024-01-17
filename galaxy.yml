@@ -5,7 +5,7 @@ readme: README.md
 authors:
 - GCore (@GCore)
 
-description: A variety of Ansible content to help automate the management of Gcore services.
+description: A variety of Ansible content to help automate the management of GCore services.
 
 license:
 - GPL-3.0-or-later

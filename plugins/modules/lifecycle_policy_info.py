@@ -121,6 +121,7 @@ lifecycle_policy_info:
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, to_native
+
 from ansible_collections.gcore.cloud.plugins.module_utils.cloud import (
     AnsibleCloudClient,
 )
@@ -151,7 +152,7 @@ def main():
             ("project_id", "project_name"),
             ("region_id", "region_name"),
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
     try:
         manage(module)
