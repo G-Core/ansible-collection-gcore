@@ -5,11 +5,11 @@ DOCUMENTATION = r"""
     name: cloud
     author:
       - GCore (@GCore)
-    short_description: Ansible dynamic inventory plugin for the Gcore Cloud.
+    short_description: Ansible dynamic inventory plugin for the GCore Cloud.
     requirements:
         - python >= 3.10
     description:
-        - Reads inventories from the Gcore public API.
+        - Reads inventories from the GCore public API.
         - Uses a YAML configuration file that ends with gcore.(yml|yaml).
     extends_documentation_fragment:
         - constructed
@@ -17,7 +17,7 @@ DOCUMENTATION = r"""
     options:
         plugin:
             description:
-            - The name of the Gcore Inventory Plugin.
+            - The name of the GCore Inventory Plugin.
             required: true
             choices: ['gcore.cloud.cloud']
         api_key:
@@ -179,8 +179,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.display.vvv(f"Sending request to {url}")
             request = Request(headers=self.headers)
             return json.load(request.get(url))["results"]
-        except ValueError:
-            raise AnsibleParserError("Cannot parse the JSON from response.")
+        except ValueError as exc:
+            raise AnsibleParserError("Cannot parse the JSON from response.") from exc
 
     def _filter_servers(self, servers):
         status = self.get_option("status")
@@ -196,7 +196,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return self._request("v1/instances")
 
     def parse(self, inventory, loader, path, cache=True):
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         self._read_config_data(path)
 
