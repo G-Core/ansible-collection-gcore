@@ -21,8 +21,8 @@
     - name: Verify servergroup
       ansible.builtin.assert:
         that:
-          - created_servergroup.data.name == "{{ servergroup_name }}"
-          - created_servergroup.data.policy == "{{ servergroup_policy }}"
+          - created_servergroup.data.name == servergroup_name
+          - created_servergroup.data.policy == servergroup_policy
           - created_servergroup.data.instances | list | length == 0
 
     - name: Get servergroup list
@@ -40,4 +40,4 @@
 
   always:
     - name: Cleanup servergroups
-      import_tasks: ./targets/common/tasks/cleanup_servergroups.yml
+      import_tasks: cleanup.yml

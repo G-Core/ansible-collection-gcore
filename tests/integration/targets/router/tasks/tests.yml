@@ -20,7 +20,7 @@
     - name: Verify router
       ansible.builtin.assert:
         that:
-          - created_router.data.name == "{{ router_name }}"
+          - created_router.data.name == router_name
 
     - name: Update router
       gcore.cloud.router:
@@ -35,4 +35,4 @@
     - name: Verify router updating
       ansible.builtin.assert:
         that:
-          - updated_router.data.name == "{{ updated_router_name }}"
+          - updated_router.data.name == updated_router_name

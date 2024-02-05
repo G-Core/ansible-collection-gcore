@@ -15,7 +15,7 @@
         region_id: "{{ region_id }}"
         volume_id: "{{ created_volume.data.id }}"
       register: find_volume
-    
+
     - name: Create new snapshot
       gcore.cloud.volume_snapshot:
         api_key: "{{ api_key }}"
@@ -29,7 +29,7 @@
     - name: Verify snapshot
       ansible.builtin.assert:
         that:
-          - created_snapshot.data.name == "{{ snapshot_name }}"
+          - created_snapshot.data.name == snapshot_name
 
     - name: Get snapshot by its volume id
       gcore.cloud.volume_snapshot_info:
@@ -54,9 +54,3 @@
           - volume.data.snapshot_ids | list | length == 1
           - volume.data.snapshot_ids[0] == find_snapshot.data[0]['id']
           - volume.data.id == find_snapshot.data[0].volume_id
-
-  always:
-    - name: Cleanup volumes snapshots
-      import_tasks: ./targets/common/tasks/cleanup_volume_snapshots.yml
-    - name: Cleanup volumes
-      import_tasks: ./targets/common/tasks/cleanup_volumes.yml

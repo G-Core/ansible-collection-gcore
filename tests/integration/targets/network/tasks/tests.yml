@@ -21,7 +21,7 @@
     - name: Verify network
       ansible.builtin.assert:
         that:
-          - created_network.data.name == "{{ network_name }}"
+          - created_network.data.name == network_name
           - created_network.data.type == "vxlan"
           - created_network.data.metadata[0].key == "ansible_key"
 
@@ -38,4 +38,4 @@
     - name: Verify name updated
       ansible.builtin.assert:
         that:
-          - updated_network.data.name == "{{ new_network_name }}"
+          - updated_network.data.name == new_network_name

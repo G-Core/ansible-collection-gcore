@@ -50,4 +50,4 @@
 
   always:
     - name: Cleanup reserved fixed ips
-      import_tasks: ./targets/common/tasks/cleanup_reserved_fixed_ips.yml
+      import_tasks: cleanup.yml

@@ -34,8 +34,8 @@
       ansible.builtin.assert:
         that:
           - created_instance.data.status == "ACTIVE"
-          - created_instance.data.instance_name == "{{ instance_name }}"
-          - created_instance.data.flavor.flavor_name == "{{ instance_flavor }}"
+          - created_instance.data.instance_name == instance_name
+          - created_instance.data.flavor.flavor_name == instance_flavor
 
     - name: Update instance's name
       gcore.cloud.instance:
@@ -50,4 +50,4 @@
     - name: Verify new instance name
       ansible.builtin.assert:
         that:
-          - updated_instance.data.instance_name == "{{ new_instance_name }}"
+          - updated_instance.data.instance_name == new_instance_name
