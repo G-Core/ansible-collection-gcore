@@ -26,7 +26,7 @@
     - name: Verify securitygroup
       ansible.builtin.assert:
         that:
-          - created_securitygroup.data.name == "{{ securitygroup_name }}"
+          - created_securitygroup.data.name == securitygroup_name
           - created_securitygroup.data.security_group_rules | list | length >= 1
 
     - name: Update securitygroup
@@ -42,7 +42,7 @@
     - name: Verify updating securitygroup
       ansible.builtin.assert:
         that:
-          - updated_securitygroup.data.name == "{{ updated_securitygroup_name }}"
+          - updated_securitygroup.data.name == updated_securitygroup_name
 
     - name: Copy securitygroup
       gcore.cloud.securitygroup:
@@ -57,8 +57,8 @@
     - name: Verify securitygroup copy
       ansible.builtin.assert:
         that:
-          - copied_securitygroup.data.name == "{{ copied_securitygroup_name }}"
-    
+          - copied_securitygroup.data.name == copied_securitygroup_name
+
     - name: Get list securitygroup
       gcore.cloud.securitygroup_info:
         api_key: "{{ api_key }}"
@@ -82,8 +82,8 @@
     - name: Verify securitygroup
       ansible.builtin.assert:
         that:
-          - copied_securitygroup.data.name == "{{ copied_securitygroup_name }}"
+          - copied_securitygroup.data.name == copied_securitygroup_name
 
   always:
     - name: Cleanup securitygroups
-      import_tasks: ./targets/common/tasks/cleanup_securitygroups.yml
+      import_tasks: cleanup.yml

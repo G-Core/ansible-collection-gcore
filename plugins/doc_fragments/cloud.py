@@ -10,7 +10,7 @@ options:
     api_key:
         description:
             - GCore API auth key
-            - Can be passed as I(CLOUD_API_HOST) environment variable.
+            - Can be passed as I(CLOUD_API_KEY) environment variable.
         type: str
     api_timeout:
         description:

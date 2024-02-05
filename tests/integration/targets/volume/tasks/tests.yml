@@ -27,9 +27,9 @@
     - name: Verify volume
       ansible.builtin.assert:
         that:
-          - created_volume.data.name == "{{ volume_name }}"
+          - created_volume.data.name == volume_name
           - created_volume.data.size == 1
-          - created_volume.data.volume_type == "{{ volume_type_name }}"
+          - created_volume.data.volume_type == volume_type_name
           - created_volume.data.metadata.ansible_key == "ansible_value"
 
     - name: Get volume by ID
@@ -54,7 +54,7 @@
     - name: Verify volume's rename
       ansible.builtin.assert:
         that:
-          - updated_volume.data.name == "{{ updated_volume_name }}"
+          - updated_volume.data.name == updated_volume_name
 
     - name: Extend existing volume
       gcore.cloud.volume:
@@ -70,7 +70,7 @@
       ansible.builtin.assert:
         that:
           - extended_volume.data.size == 2
-    
+
     - name: Retype existing volume
       gcore.cloud.volume:
         api_key: "{{ api_key }}"
@@ -80,7 +80,7 @@
         command: retype
         volume_id: "{{ extended_volume.data.id }}"
         volume_type: "{{ new_volume_type_name }}"
-    
+
     - name: Wait for retyping
       ansible.builtin.pause:
         seconds: 10
@@ -96,4 +96,4 @@
     - name: Verify volume's new type
       ansible.builtin.assert:
         that:
-          - retyped_volume.data.volume_type == "{{ new_volume_type_name }}"
+          - retyped_volume.data.volume_type == new_volume_type_name

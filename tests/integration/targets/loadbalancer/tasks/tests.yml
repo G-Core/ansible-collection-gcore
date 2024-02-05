@@ -20,7 +20,7 @@
     - name: Verify loadbalancer
       ansible.builtin.assert:
         that:
-          - created_loadbalancer.data.name == "{{ loadbalancer_name }}"
+          - created_loadbalancer.data.name == loadbalancer_name
 
     - name: Update existing loadbalancer's name
       gcore.cloud.loadbalancer:
@@ -35,7 +35,7 @@
     - name: Verify name updated
       ansible.builtin.assert:
         that:
-          - updated_loadbalancer.data.name == "{{ new_loadbalancer_name }}"
+          - updated_loadbalancer.data.name == new_loadbalancer_name
 
     - name: Get loadbalancer with stats
       gcore.cloud.loadbalancer_info:

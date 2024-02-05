@@ -28,11 +28,11 @@
     - name: Verify subnet
       ansible.builtin.assert:
         that:
-          - created_subnet.data.name == "{{ subnet_name }}"
+          - created_subnet.data.name == subnet_name
           - created_subnet.data.has_router == false
           - created_subnet.data.dns_nameservers == ['8.8.8.8', '8.8.4.4']
-          - created_subnet.data.cidr == "{{ subnet_cidr }}"
-          - created_subnet.data.network_id == "{{ created_network.data.id }}"
+          - created_subnet.data.cidr == subnet_cidr
+          - created_subnet.data.network_id == created_network.data.id
           - created_subnet.data.metadata[0].key == "ansible_key"
 
     - name: Update existing subnet
@@ -50,11 +50,11 @@
     - name: Verify updated subnet
       ansible.builtin.assert:
         that:
-          - updated_subnet.data.name == "{{ new_subnet_name }}"
-          - updated_subnet.data.dns_nameservers == {{ dns_nameservers }}
+          - updated_subnet.data.name == new_subnet_name
+          - updated_subnet.data.dns_nameservers == dns_nameservers
           - updated_subnet.data.enable_dhcp == false
           - updated_subnet.data.host_routes | list | length == 0
-    
+
     - name: Update routes for subnet
       gcore.cloud.subnet:
         api_key: "{{ api_key }}"
@@ -69,9 +69,3 @@
       ansible.builtin.assert:
         that:
           - subnet_with_routes.data.host_routes | list | length == 1
-
-  always:
-    - name: Cleanup subnets
-      import_tasks: ./targets/common/tasks/cleanup_subnets.yml
-    - name: Cleanup newtworks
-      import_tasks: ./targets/common/tasks/cleanup_networks.yml

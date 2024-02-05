@@ -24,8 +24,8 @@
     - name: Verify lb listener
       ansible.builtin.assert:
         that:
-          - created_lb_listener.data.name == "{{ lb_listener_name }}"
-          - created_lb_listener.data.protocol == "{{ listener_protocol }}"
+          - created_lb_listener.data.name == lb_listener_name
+          - created_lb_listener.data.protocol == listener_protocol
 
     - name: Update listener's name
       gcore.cloud.loadbalancer_listener:
@@ -40,4 +40,4 @@
     - name: Verify new listener name
       ansible.builtin.assert:
         that:
-          - updated_lb_listener.data.name == "{{ new_lb_listener_name }}"
+          - updated_lb_listener.data.name == new_lb_listener_name

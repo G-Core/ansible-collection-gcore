@@ -3,4 +3,4 @@
     - import_tasks: tests.yml
   always:
     - name: Cleanup volumes
-      import_tasks: ./targets/common/tasks/cleanup_volumes.yml
+      import_tasks: cleanup.yml

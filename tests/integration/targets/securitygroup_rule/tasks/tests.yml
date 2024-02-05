@@ -20,7 +20,7 @@
     - name: Verify rule
       ansible.builtin.assert:
         that:
-          - created_rule.data.security_group_id == "{{ created_securitygroup.data.id }}"
+          - created_rule.data.security_group_id == created_securitygroup.data.id
           - created_rule.data.direction == "ingress"
           - created_rule.data.ethertype == "IPv4"
 
@@ -62,4 +62,4 @@
 
   always:
     - name: Cleanup securitygroups
-      import_tasks: ./targets/common/tasks/cleanup_securitygroups.yml
+      import_tasks: cleanup.yml

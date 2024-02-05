@@ -3,5 +3,5 @@
     - import_tasks: setup.yml
     - import_tasks: tests.yml
   always:
-    - name: Cleanup subnets
+    - name: Cleanup volumes snapshots and volumes
       include_tasks: cleanup.yml

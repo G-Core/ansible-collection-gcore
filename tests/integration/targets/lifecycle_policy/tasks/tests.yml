@@ -24,7 +24,7 @@
     - name: Verify policy
       ansible.builtin.assert:
         that:
-          - created_policy.data["name"] == "{{ policy_name }}"
+          - created_policy.data["name"] == policy_name
 
     - name: Update policy
       gcore.cloud.lifecycle_policy:
@@ -36,7 +36,7 @@
         lifecycle_policy_id: "{{ created_policy.data.id }}"
         name: "{{ new_policy_name }}"
       register: updated_policy
-    
+
     - name: Get policy by id
       gcore.cloud.lifecycle_policy_info:
         api_key: "{{ api_key }}"
@@ -45,13 +45,13 @@
         region_id: "{{ region_id }}"
         lifecycle_policy_id: "{{ updated_policy.data.id }}"
       register: policy
-    
+
     - name: Verify policy
       ansible.builtin.assert:
         that:
-          - policy.data.name == "{{ new_policy_name }}"
-          - policy.data.action == "{{ policy_action }}"
-    
+          - policy.data.name == new_policy_name
+          - policy.data.action == policy_action
+
     - name: Add volume to policy
       gcore.cloud.lifecycle_policy:
         api_key: "{{ api_key }}"
@@ -75,11 +75,11 @@
     - name: Validate policies volumes
       ansible.builtin.assert:
         that:
-          - policy_with_volumes.data.volumes[0].volume_id == "{{ created_volume.data.id }}"
-          - policy_with_volumes.data.volumes[0].volume_name == "{{ created_volume.data.name }}"
+          - policy_with_volumes.data.volumes[0].volume_id == created_volume.data.id
+          - policy_with_volumes.data.volumes[0].volume_name == created_volume.data.name
 
   always:
     - name: Cleanup policies
-      import_tasks: ./targets/common/tasks/cleanup_lifecycle_policy.yml
+      import_tasks: cleanup.yml
     - name: Cleanup volumes
-      import_tasks: ./targets/common/tasks/cleanup_volumes.yml
+      import_tasks: cleanup_volumes.yml

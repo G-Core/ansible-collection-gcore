@@ -19,7 +19,7 @@
     - name: Verify created keypair
       ansible.builtin.assert:
         that:
-          - created_keypair.data.sshkey_name == "{{ keypair_name }}"
+          - created_keypair.data.sshkey_name == keypair_name
           - created_keypair.data.state == "ACTIVE"
           - created_keypair.data.shared_in_project == true
 
@@ -48,4 +48,4 @@
 
   always:
     - name: Cleanup keypairs
-      import_tasks: ./targets/common/tasks/cleanup_keypairs.yml
+      import_tasks: cleanup.yml
