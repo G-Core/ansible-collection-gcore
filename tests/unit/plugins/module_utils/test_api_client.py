@@ -1,7 +1,8 @@
 import unittest
 
-from ansible_collections.gcore.cloud.plugins.module_utils.api import CloudAPIClient
 from mock import MagicMock
+
+from ansible_collections.gcore.cloud.plugins.module_utils.api import CloudAPIClient
 
 
 def mock_module(params: dict):
