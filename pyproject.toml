@@ -44,6 +44,8 @@ wrong-import-position,
 no-name-in-module,
 use-dict-literal,
 broad-exception-caught,
+too-many-instance-attributes,
+duplicate-code,
 """
 
 [build-system]

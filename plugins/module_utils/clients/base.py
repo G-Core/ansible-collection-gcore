@@ -1,8 +1,10 @@
+# pylint: disable=inconsistent-return-statements
 from string import Formatter
 from time import sleep
 from typing import Optional
 
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.gcore.cloud.plugins.module_utils.api import CloudAPIClient
 from ansible_collections.gcore.cloud.plugins.module_utils.exceptions import (
     ValidationError,

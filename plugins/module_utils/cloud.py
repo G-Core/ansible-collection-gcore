@@ -1,4 +1,5 @@
 from ansible.module_utils.basic import AnsibleModule, env_fallback
+
 from ansible_collections.gcore.cloud.plugins.module_utils.api import CloudAPIClient
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.image import (
     CloudImageClient,
@@ -33,8 +34,8 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.reserved_fip i
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.router import (
     CloudRouterClient,
 )
-from ansible_collections.gcore.cloud.plugins.module_utils.clients.servergroup import (
-    CloudServerGroupClient,
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.secret import (
+    CloudSecretClient,
 )
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup import (
     CloudSecurityGroupClient,
@@ -42,8 +43,8 @@ from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup 
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.securitygroup_rule import (
     CloudSecurityGroupRuleClient,
 )
-from ansible_collections.gcore.cloud.plugins.module_utils.clients.secret import (
-    CloudSecretClient,
+from ansible_collections.gcore.cloud.plugins.module_utils.clients.servergroup import (
+    CloudServerGroupClient,
 )
 from ansible_collections.gcore.cloud.plugins.module_utils.clients.snapshot import (
     CloudSnapshotClient,
