@@ -4,7 +4,7 @@
 - python >= 3.10
 
 
-## Building Collection 
+## Building Collection
 Clone repository
 ```
 mkdir -p /home/$USER/ansible_collections/gcore
@@ -25,7 +25,7 @@ ansible-galaxy collection install <path_to_tarball_from_previous_command>
 ```
 
 
-## Testing Collection 
+## Testing Collection
 
 Once installed, you can reference a collection content by its fully qualified collection name (FQCN).
 
