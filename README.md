@@ -1,28 +1,77 @@
-# GCore Ansible Community Collection
-## Installation and Usage
-- ansible-core >= 2.15
-- python >= 3.10
+# Ansible Collection for GCore Cloud
 
+This collection provides a series of Ansible modules and plugins for interacting with the [GCore](https://gcore.com) Cloud.
 
-## Building Collection
-Clone repository
-```
-mkdir -p /home/$USER/ansible_collections/gcore
-cd /home/$USER/ansible_collections/gcore
-git clone ssh://git@gitlab-ed7.cloud.gc.onl:2200/cloudapi/ansible-provider.git cloud
+## Installation
+
+To install the collection hosted in Galaxy:
+
+```bash
+ansible-galaxy collection install gcore.cloud
 ```
 
-to building collection run the following command in the project directory:
+To upgrade to the latest version of the collection:
 
-```
-ansible-galaxy collection build
+```bash
+ansible-galaxy collection install gcore.cloud --force
 ```
 
-install the built collection locally for testing:
+## License
 
+GNU General Public License v3.0
+
+See [COPYING](COPYING) to see the full text.
+
+## Usage
+
+### Playbooks
+
+To use a module from the gcore collection, please reference the full namespace, collection name, and modules name that you want to use:
+
+```yaml
+---
+- name: Using gcore collection
+  hosts: localhost
+  tasks:
+    - gcore.cloud.instance:
+        names: ["my_new_vm"]
+        flavor: "g1-standard-1-2"
+        volumes: [{
+          'source': 'image',
+          'size': 10,
+          'type_name': 'standard',
+          'boot_index': 0,
+          'image_id': '9c440e4d-a157-4389-bb10-c53a72755356',
+          'delete_on_termination': False
+        }]
+        interfaces: [{"type": "external"}]
+        api_key: ...
+        api_host: ...
+        project_id: 111
+        region_id: 76
+        command: create
 ```
-ansible-galaxy collection install <path_to_tarball_from_previous_command>
+
+Or you can add the full namespace and collection name in the `collections` element:
+
+```yaml
+---
+- name: Using gcore collection
+  hosts: localhost
+  collections:
+    - gcore.cloud
+  tasks:
+    - instance:
+        ...
 ```
+
+## Contributing
+
+There are many ways in which you can participate in the project, for example:
+
+- Submit bugs and feature requests, and help us verify them as they are checked in
+- Review source code changes
+- Review the documentation and make pull requests for anything from typos to new content
 
 
 ## Testing Collection
